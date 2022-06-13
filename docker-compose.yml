@@ -29,4 +29,10 @@ services:
       - 27017:27017
     env_file:
       - ./services/.env
+  api:
+    container_name: api
+    ports:
+    - "3001:3001"
+    restart: unless-stopped
+    build: ./backend
   
