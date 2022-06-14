@@ -36,4 +36,9 @@ services:
     - "3001:3001"
     restart: unless-stopped
     build: ./backend
-  
+  mongo:
+    container_name: cache
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
