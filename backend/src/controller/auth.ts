@@ -4,6 +4,7 @@ import { getToken, getTracks } from "./deezer";
 import { PrismaClient, User, SpotifyInfo, DeezerInfo } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
 const findUser = async (email: string) => {
   const user = await prisma.user.findFirst({
     where: {
@@ -16,6 +17,7 @@ const findUser = async (email: string) => {
   });
   return user as User & { spotify: SpotifyInfo; deezer: DeezerInfo };
 };
+
 export const AuthController = {
   async spotify(req: Request, res: Response) {
     try {

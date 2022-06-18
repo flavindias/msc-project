@@ -35,3 +35,17 @@ export const getTracks = async (token: string) => {
         console.log(err);
     }
 }
+
+export const getTrackByISRC = async (token: string, isrc: string) => {
+    try {
+        const response = await axios.get(`https://api.deezer.com/2.0/track/isrc:${isrc}`, {
+            params: {
+                access_token: token
+            }
+        });
+        return response.data;
+    }
+    catch(err){
+        console.log(err);
+    }
+}
