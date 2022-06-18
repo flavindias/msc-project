@@ -11,14 +11,17 @@ datasource db {
 }
 
 model User {
-  id        String       @id @default(cuid())
-  name      String
-  email     String       @unique
-  password  String?
-  spotify   SpotifyInfo?
-  deezer    DeezerInfo?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @default(now())
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  password    String?
+  spotify     SpotifyInfo?
+  deezer      DeezerInfo?
+  rooms       Room[]       @relation("owner")
+  memberRooms RoomUser[]   @relation("member")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  votes   RoomVotes[] @relation("userVotes")
 }
 
 model SpotifyInfo {
@@ -46,14 +49,85 @@ model DeezerInfo {
   updatedAt DateTime @default(now())
 }
 
-// model Artist {
+model Artist {
+  id        String   @id @default(cuid())
+  name      String
+  picture   String?
+  spotifyId String   @unique
+  deezerId  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
 
-// }
+model Track {
+  id         String       @id @default(cuid())
+  name       String
+  duration   Int
+  explicit   Boolean
+  isrc       String       @unique
+  spotifyId  String       @unique
+  deezerId   String       @unique
+  popularity Int?
+  room       RoomTracks[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now())
 
-// model Track {
+}
 
-// }
+model Album {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
 
-// model Album {
+model Room {
+  id        String       @id @default(cuid())
+  name      String
+  owner     User         @relation("owner", fields: [ownerId], references: [id])
+  ownerId   String
+  users     RoomUser[]
+  tracks    RoomTracks[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now())
 
-// }
+}
+
+model RoomTracks {
+  id        String      @id @default(cuid())
+  room      Room?       @relation(fields: [roomId], references: [id])
+  roomId    String?
+  Track     Track?      @relation(fields: [trackId], references: [id])
+  trackId   String?
+  votes RoomVotes[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now())
+}
+
+model RoomUser {
+  id     String @id @default(cuid())
+  user   User   @relation("member", fields: [userId], references: [id])
+  userId String
+  room   Room   @relation(fields: [roomId], references: [id])
+  roomId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model RoomVotes {
+  id        String     @id @default(cuid())
+  user      User       @relation("userVotes", fields: [userId], references: [id])
+  userId    String
+  track     RoomTracks @relation(fields: [trackId], references: [id])
+  trackId   String
+  vote      Vote @default(NEUTRAL)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+}
+
+enum Vote {
+  LIKE
+  NEUTRAL
+  DISLIKE
+}
