@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Request, Response } from "express";
-import { getToken } from "./deezer";
+import { getToken, getTracks } from "./deezer";
 import { PrismaClient, User, SpotifyInfo, DeezerInfo } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -30,7 +30,7 @@ export const AuthController = {
         id: response.data.id,
         product: response.data.product,
         country: response.data.country,
-        picture: response.data.picture,
+        picture: response.data.images[0].url,
         type: response.data.type,
         uri: response.data.uri,
       };
@@ -110,8 +110,9 @@ export const AuthController = {
         });
         return res.status(200).json(updatedUser);
       }
-
-      return res.status(200).json(response.data);
+      await getTracks(authToken);
+      
+      return res.status(200).json(user);
     } catch (err) {
       console.log(err);
       return res.status(500).json({

@@ -22,11 +22,13 @@ export const getToken = async (code: string) => {
 
 export const getTracks = async (token: string) => {
     try {
+        console.log(token, "token");
         const response = await axios.get('https://api.deezer.com/user/me/tracks', {
             params: {
                 access_token: token
             }
         });
+        console.log(response.data, "getTracks");
         return response.data.data;
     }
     catch(err){
