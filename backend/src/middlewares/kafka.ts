@@ -1,61 +1,85 @@
-import dotenv from 'dotenv';
-import { Kafka, Consumer, Producer, logLevel } from "kafkajs";
+import dotenv from "dotenv";
+import {
+  Kafka,
+  Consumer,
+  Producer,
+  Admin,
+  Partitioners,
+  ITopicConfig,
+} from "kafkajs";
 dotenv.config();
 
-const { KAFKA_BROKERS } = process.env;
+const { KAFKA_BROKERS, KAFKA_TOPICS } = process.env;
 
 export class KafkaConnection {
   private kafka: Kafka;
   private consumer: Consumer;
   private producer: Producer;
+  private admin: Admin;
 
   constructor() {
+    console.log(KAFKA_BROKERS);
     this.kafka = new Kafka({
-      clientId: "kafka-client",
+      clientId: "my-app",
       brokers: `${KAFKA_BROKERS}`.split(","),
-      logLevel: logLevel.INFO,
+      connectionTimeout: 3000,
+      retry: {
+        initialRetryTime: 100,
+        retries: 8,
+      },
     });
-    this.producer = this.kafka.producer();
+
+    this.producer = this.kafka.producer({
+      createPartitioner: Partitioners.LegacyPartitioner,
+    });
     this.consumer = this.kafka.consumer({ groupId: `deejai-group` });
+    this.admin = this.kafka.admin();
   }
 
-  async subscribe(topics: string[]): Promise<void> {
+  async subscribe(): Promise<void> {
     try {
-      topics.forEach(async topic => {
-          await this.consumer.stop();
-          await this.consumer.subscribe({ topic, fromBeginning: false });
+      `${KAFKA_TOPICS}`.split(",").forEach(async (topic) => {
+        await this.consumer.subscribe({ topic, fromBeginning: true });
       });
-      const resumeList = topics.map(topic => { return { topic }; });
-      await this.consumer.resume(resumeList);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async produce(topic: string, data: string): Promise<void> {
+  async publish(topic: string, data: string): Promise<void> {
     try {
       await this.producer.connect();
-      const resp = await this.producer.send({
-        topic,
-        timeout: 2,
-        messages: [
-          {
-            key: `key-${Math.random().toString(36).substring(7)}`,
-            value: data,
-          },
-        ],
+      await this.producer.send({
+        topic: topic,
+        messages: [{ value: data }],
       });
-      if (resp) {
-        console.log(resp, "data has been sent");
-        // return { resp, topic, data };
-      }
+
+      await this.producer.disconnect();
     } catch (error) {
       console.error(error);
     }
   }
-
-  async consume(): Promise<void> {
+  
+  async run(): Promise<void> {
     try {
+      await this.admin.connect();
+
+      const topics: ITopicConfig[] = `${KAFKA_TOPICS}`
+        .split(",")
+        .map((topic) => {
+          return {
+            topic,
+            numPartitions: 1,
+            replicationFactor: 1,
+          } as ITopicConfig;
+        });
+
+      await this.admin.createTopics({
+        topics,
+      });
+      await this.producer.connect();
+      await this.consumer.connect();
+      await this.subscribe();
       await this.consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
           console.log({
