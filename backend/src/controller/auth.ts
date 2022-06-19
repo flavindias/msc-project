@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { sign } from "jsonwebtoken";
+import db from "../middlewares/mongo";
 import { compare, hashSync } from "bcryptjs";
 import { Request, Response } from "express";
 import { getToken, getTracks } from "./deezer";
@@ -23,7 +24,7 @@ const findUser = async (email: string) => {
   return user as User & { spotify: SpotifyInfo; deezer: DeezerInfo };
 };
 
-const token = (id: string) => sign({ id }, `${JWT_SECRET}`);
+const generateJWTToken = (id: string) => sign({ id }, `${JWT_SECRET}`);
 
 export const AuthController = {
   async spotify(req: Request, res: Response) {
@@ -34,7 +35,14 @@ export const AuthController = {
           Authorization: `Bearer ${token}`,
         },
       });
+      if(!response.data.id) throw new Error("Authentication failed");
       const user = await findUser(response.data.email);
+      if(!user) throw new Error("User not found");
+      await db.collection("spotifyTokens").insertOne({
+        userId: user.id,
+        token,
+        createdAt: new Date(),
+      });
       const spotify = {
         id: response.data.id,
         product: response.data.product,
@@ -55,7 +63,7 @@ export const AuthController = {
           },
         });
         
-        return res.status(200).json({user: newUser, token: token(newUser.id) });
+        return res.status(200).json({user: newUser, token: generateJWTToken(newUser.id) });
       }
       if (!user.spotify) {
         const updatedUser = await prisma.user.update({
@@ -68,10 +76,10 @@ export const AuthController = {
             },
           },
         });
-        return res.status(200).json({user: updatedUser, token: token(updatedUser.id) });
+        return res.status(200).json({user: updatedUser, token: generateJWTToken(updatedUser.id) });
       }
-
-      return res.status(200).json({user, token: token(user.id) });
+      
+      return res.status(200).json({user, token: generateJWTToken(user.id) });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -89,7 +97,15 @@ export const AuthController = {
           access_token: authToken,
         },
       });
+      if(!response.data.id) throw new Error("Authentication failed");
+      
       const user = await findUser(response.data.email);
+      if(!user) throw new Error("User not found");
+      await db.collection("deezerTokens").insertOne({
+        userId: user.id,
+        token,
+        createdAt: new Date(),
+      });
       const deezer = {
         id: `${response.data.id}`,
         country: response.data.country,
@@ -108,7 +124,7 @@ export const AuthController = {
             },
           },
         });
-        return res.status(200).json({user:newUser, token: token(newUser.id) });
+        return res.status(200).json({user:newUser, token: generateJWTToken(newUser.id) });
       }
       if (!user.deezer) {
         const updatedUser = await prisma.user.update({
@@ -121,11 +137,11 @@ export const AuthController = {
             },
           },
         });
-        return res.status(200).json({user:updatedUser, token: token(updatedUser.id) });
+        return res.status(200).json({user:updatedUser, token: generateJWTToken(updatedUser.id) });
       }
       await getTracks(authToken);
       
-      return res.status(200).json({user, token: token(user.id) });
+      return res.status(200).json({user, token: generateJWTToken(user.id) });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -142,7 +158,7 @@ export const AuthController = {
       const isValid = await compare(password, `${user.password}`);
       if (!isValid) throw new Error("Invalid email or password");
       
-      return res.status(200).json({user, token: token(user.id) });
+      return res.status(200).json({user, token: generateJWTToken(user.id) });
     }
     catch (err) {
       return res.status(500).json({

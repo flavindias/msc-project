@@ -4,10 +4,9 @@ import Logger from "./logger";
 
 dotenv.config();
 
-const { DB_NAME, DB_URL } = process.env;
+const { MONGO_DB_NAME, MONGO_DB_URL } = process.env;
 
-const dbUrl = `${DB_URL}`;
-const db = new MongoClient(dbUrl);
+const db = new MongoClient(`${MONGO_DB_URL}`);
 
 db.connect(async (err) => {
   if (err) {
@@ -17,11 +16,11 @@ db.connect(async (err) => {
   Logger.info("Connected to database");
 });
 
-db.db(DB_NAME)
+db.db(MONGO_DB_NAME)
   .collection("deezerTokens")
-  .createIndex({ lastModifiedDate: 1 }, { expireAfterSeconds: 3600 });
-db.db(DB_NAME)
+  .createIndex({ "createdAt": 1 }, { expireAfterSeconds: 86400 }); // 24 hours
+db.db(MONGO_DB_NAME)
   .collection("spotifyTokens")
-  .createIndex({ lastModifiedDate: 1 }, { expireAfterSeconds: 3600 });
+  .createIndex({ "createdAt": 1 }, { expireAfterSeconds: 3600 }); // 1 hour
 
-export default db.db(DB_NAME);
+export default db.db(MONGO_DB_NAME);
