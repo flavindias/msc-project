@@ -17,4 +17,11 @@ db.connect(async (err) => {
   Logger.info("Connected to database");
 });
 
+db.db(DB_NAME)
+  .collection("deezerTokens")
+  .createIndex({ lastModifiedDate: 1 }, { expireAfterSeconds: 3600 });
+db.db(DB_NAME)
+  .collection("spotifyTokens")
+  .createIndex({ lastModifiedDate: 1 }, { expireAfterSeconds: 3600 });
+
 export default db.db(DB_NAME);
