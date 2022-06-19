@@ -2,13 +2,15 @@ import axios from "axios";
 import dotenv from "dotenv";
 import { sign } from "jsonwebtoken";
 import db from "../middlewares/mongo";
-import { compare, hashSync } from "bcryptjs";
 import { Request, Response } from "express";
-import { getToken, getTracks } from "./deezer";
+import { compare, hashSync } from "bcryptjs";
+import { getToken } from "../middlewares/deezer";
+import { KafkaConnection } from "../middlewares/kafka";
 import { PrismaClient, User, SpotifyInfo, DeezerInfo } from "@prisma/client";
 dotenv.config();
 
 const prisma = new PrismaClient();
+const kafka = KafkaConnection.getInstance();
 const { JWT_SECRET } = process.env;
 
 const findUser = async (email: string) => {
@@ -37,12 +39,8 @@ export const AuthController = {
       });
       if(!response.data.id) throw new Error("Authentication failed");
       const user = await findUser(response.data.email);
-      if(!user) throw new Error("User not found");
-      await db.collection("spotifyTokens").insertOne({
-        userId: user.id,
-        token,
-        createdAt: new Date(),
-      });
+      
+      let userResponse: User;
       const spotify = {
         id: response.data.id,
         product: response.data.product,
@@ -52,7 +50,7 @@ export const AuthController = {
         uri: response.data.uri,
       };
       if (!user) {
-        const newUser = await prisma.user.create({
+        userResponse = await prisma.user.create({
           data: {
             email: response.data.email,
             name: response.data.display_name,
@@ -63,10 +61,13 @@ export const AuthController = {
           },
         });
         
-        return res.status(200).json({user: newUser, token: generateJWTToken(newUser.id) });
+      }
+      else{
+        userResponse = user;
+
       }
       if (!user.spotify) {
-        const updatedUser = await prisma.user.update({
+        userResponse = await prisma.user.update({
           where: {
             email: user.email,
           },
@@ -76,10 +77,15 @@ export const AuthController = {
             },
           },
         });
-        return res.status(200).json({user: updatedUser, token: generateJWTToken(updatedUser.id) });
       }
-      
-      return res.status(200).json({user, token: generateJWTToken(user.id) });
+      const usr = {
+        userId: userResponse.id,
+        token,
+        createdAt: new Date(),
+      }
+      await kafka.publish("spotify-login", JSON.stringify(usr));
+      await db.collection("spotifyTokens").insertOne(usr);
+      return res.status(200).json({user: userResponse, token: generateJWTToken(userResponse.id) });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -100,12 +106,8 @@ export const AuthController = {
       if(!response.data.id) throw new Error("Authentication failed");
       
       const user = await findUser(response.data.email);
-      if(!user) throw new Error("User not found");
-      await db.collection("deezerTokens").insertOne({
-        userId: user.id,
-        token,
-        createdAt: new Date(),
-      });
+      let userResponse: User;
+      
       const deezer = {
         id: `${response.data.id}`,
         country: response.data.country,
@@ -113,8 +115,9 @@ export const AuthController = {
         link: response.data.link,
         picture: response.data.picture_medium,
       };
+
       if (!user) {
-        const newUser = await prisma.user.create({
+        userResponse = await prisma.user.create({
           data: {
             email: response.data.email,
             password: hashSync((Math.random() + 1).toString(36).substring(7), 10),
@@ -124,10 +127,13 @@ export const AuthController = {
             },
           },
         });
-        return res.status(200).json({user:newUser, token: generateJWTToken(newUser.id) });
       }
+      else{
+        userResponse = user
+      }
+
       if (!user.deezer) {
-        const updatedUser = await prisma.user.update({
+        userResponse = await prisma.user.update({
           where: {
             email: user.email,
           },
@@ -137,11 +143,15 @@ export const AuthController = {
             },
           },
         });
-        return res.status(200).json({user:updatedUser, token: generateJWTToken(updatedUser.id) });
       }
-      await getTracks(authToken);
-      
-      return res.status(200).json({user, token: generateJWTToken(user.id) });
+      const usr = {
+        userId: userResponse.id,
+        token: authToken,
+        createdAt: new Date(),
+      }
+      await kafka.publish("deezer-login", JSON.stringify(usr));
+      await db.collection("deezerTokens").insertOne(usr);
+      return res.status(200).json({user: userResponse, token: generateJWTToken(userResponse.id) });
     } catch (err) {
       console.log(err);
       return res.status(500).json({

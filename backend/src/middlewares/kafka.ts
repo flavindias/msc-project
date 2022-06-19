@@ -8,7 +8,7 @@ import {
   ITopicConfig,
 } from "kafkajs";
 dotenv.config();
-
+import { getRecommendation } from "./deezer";
 const { KAFKA_BROKERS, KAFKA_TOPICS } = process.env;
 
 export class KafkaConnection {
@@ -16,6 +16,7 @@ export class KafkaConnection {
   private consumer: Consumer;
   private producer: Producer;
   private admin: Admin;
+  private static instance: KafkaConnection;
 
   constructor() {
     console.log(KAFKA_BROKERS);
@@ -35,6 +36,14 @@ export class KafkaConnection {
     this.consumer = this.kafka.consumer({ groupId: `deejai-group` });
     this.admin = this.kafka.admin();
   }
+
+  public static getInstance(): KafkaConnection {
+    if (!KafkaConnection.instance) {
+      KafkaConnection.instance = new KafkaConnection();
+    }
+
+    return KafkaConnection.instance;
+}
 
   async subscribe(): Promise<void> {
     try {
@@ -82,6 +91,14 @@ export class KafkaConnection {
       await this.subscribe();
       await this.consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
+          switch (topic) {
+            case "deezer-login":
+              const msg = message.value && JSON.parse(message.value.toString());
+              await getRecommendation(msg.token);
+              break;
+            default:
+              break;
+          }
           console.log({
             topic,
             partition,
