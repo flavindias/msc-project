@@ -19,7 +19,6 @@ export class KafkaConnection {
   private static instance: KafkaConnection;
 
   constructor() {
-    console.log(KAFKA_BROKERS);
     this.kafka = new Kafka({
       clientId: "my-app",
       brokers: `${KAFKA_BROKERS}`.split(","),

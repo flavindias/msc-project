@@ -80,8 +80,48 @@ export const getRecommendation = async (accessToken: string) => {
         },
       }
     );
-    console.log("getRecommendation", response.data);
+    const trackArr  = response.data.data as RecommendationReturn[];
+    
+    trackArr.forEach(song => {
+      getTrackInfo(`${song.id}`, accessToken);
+    })
   } catch (err) {
     console.log(err);
   }
 };
+
+export interface RecommendationReturn {
+  id: number,
+    readable: boolean,
+    title: string,
+    duration:  number,
+    rank: number ,
+    explicit_lyrics: false,
+    explicit_content_lyrics: number ,
+    explicit_content_cover: number,
+    md5_image: string,
+    album: {
+      id:  number,
+      title: string,
+      cover: string,
+      cover_small: string,
+      cover_medium: string,
+      cover_big: string,
+      cover_xl: string,
+      md5_image: string,
+      tracklist: string,
+      type: string,
+    },
+    artist: {
+      id:  number,
+      name: string,
+      picture: string,
+      picture_small :string,
+      picture_medium: string,
+      picture_big: string,
+      picture_xl: string,
+      tracklist: string,
+      type: string,
+    },
+    type: string,
+  }

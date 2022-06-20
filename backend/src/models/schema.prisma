@@ -19,9 +19,10 @@ model User {
   deezer      DeezerInfo?
   rooms       Room[]       @relation("owner")
   memberRooms RoomUser[]   @relation("member")
+  votes       RoomVotes[]  @relation("userVotes")
+  tracks      UserTracks[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
-  votes       RoomVotes[]  @relation("userVotes")
 }
 
 model SpotifyInfo {
@@ -50,11 +51,35 @@ model DeezerInfo {
 }
 
 model Artist {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   name      String
   picture   String?
-  spotifyId String   @unique
-  deezerId  String   @unique
+  spotifyId String?        @unique
+  deezerId  String?        @unique
+  deezer    DeezerArtist?
+  spotify   SpotifyArtist?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now())
+}
+
+model DeezerArtist {
+  artist    Artist   @relation(fields: [id], references: [deezerId])
+  id        String   @unique
+  radio     Boolean
+  link      String
+  share     String
+  tracklist String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+}
+
+model SpotifyArtist {
+  artist    Artist   @relation(fields: [id], references: [deezerId])
+  id        String   @unique
+  url       String
+  uri       String
+  href      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
@@ -62,43 +87,92 @@ model Artist {
 model Track {
   id         String        @id @default(cuid())
   name       String
-  duration   Int
-  explicit   Boolean
   isrc       String        @unique
-  spotifyId  String        @unique
-  deezerId   String        @unique
-  popularity Int?
-  tempo      Float?
+  spotifyId  String?       @unique
+  deezerId   String?       @unique
   room       RoomTracks[]
   deezer     DeezerTrack?
   spotify    SpotifyTrack?
+  album      Album?        @relation(fields: [albumId], references: [id])
+  albumId    String?
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @default(now())
-
+  userId     String?
+  UserTracks UserTracks[]
 }
 
 model DeezerTrack {
-  track       Track    @relation(fields: [trackId], references: [id])
-  trackId     String   @unique
-  releaseDate DateTime
-  readable    Boolean
-  gain        Int?
+  track          Track    @relation(fields: [id], references: [id])
+  id             String   @unique
+  releaseDate    DateTime
+  readable       Boolean
+  gain           Int?
+  duration       Int
+  trackPosition  Int
+  diskNumber     Int
+  explicitLyrics Boolean
+  bpm            Int
+  gainDb         Int
+  link           String
+  share          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+}
+
+model SpotifyTrack {
+  track       Track    @relation(fields: [id], references: [id])
+  id          String   @unique
+  href        String
+  isLocal     Boolean
+  popularity  Int
+  previewUrl  String
+  uri         String
+  trackNumber Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
 }
 
-model SpotifyTrack {
+model UserTracks {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
   track     Track    @relation(fields: [trackId], references: [id])
-  trackId   String   @unique
+  trackId   String
+  vote      Vote     @default(NEUTRAL)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
 
 model Album {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id        String        @id @default(cuid())
+  title     String
+  tracks    Track[]
+  deezer    DeezerAlbum?
+  spotify   SpotifyAlbum?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model DeezerAlbum {
+  album         Album    @relation(fields: [id], references: [id])
+  id            String   @unique
+  link          String
+  releaseDate   DateTime
+  trackListLink String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+}
+
+model SpotifyAlbum {
+  album       Album    @relation(fields: [id], references: [id])
+  id          String   @unique
+  href        String
+  uri         String
+  releaseDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
 }
 
 model Room {
