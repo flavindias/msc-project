@@ -19,3 +19,17 @@ export const getArtistInfo = () => {
 export const getAudioFeatures = () => {
     console.log('getAudioFeatures');
 };
+
+export const getTrackByISRC = async (isrc: string, token: string) => {
+    try {
+        const data = await axios.get(`https://api.spotify.com/v1/search?type=track&q=isrc:${isrc}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+              },
+        });
+        console.log(data.data);
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
