@@ -60,11 +60,9 @@ export const AuthController = {
             },
           },
         });
-        
       }
       else{
         userResponse = user;
-
       }
       if (!user.spotify) {
         userResponse = await prisma.user.update({

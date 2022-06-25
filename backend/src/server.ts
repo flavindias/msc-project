@@ -1,9 +1,9 @@
-import hpp from 'hpp';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import helmet from 'helmet';
-import express from 'express';
-import { deejaiRoutes } from './routes';
+import hpp from "hpp";
+import cors from "cors";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import express from "express";
+import { deejaiRoutes } from "./routes";
 import mongoSanitize from "express-mongo-sanitize";
 import { KafkaConnection } from "./middlewares/kafka";
 
@@ -25,11 +25,11 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true, limit: "1kb" }));
 
-app.use('/api', deejaiRoutes());
+app.use("/api", deejaiRoutes());
 
 const kafka: KafkaConnection = new KafkaConnection();
 kafka.run();
 
 app.listen(API_PORT, () => {
   console.log(`API listening on port ${API_PORT}`);
-  });
+});

@@ -5,6 +5,7 @@ services:
     # NOTE: Please use the latest version here!
     image: docker.redpanda.com/vectorized/redpanda:latest
     container_name: redpanda-1
+    restart: always
     command:
     - redpanda
     - start

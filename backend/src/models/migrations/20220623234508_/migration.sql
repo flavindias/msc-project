@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "DeezerTrack" ALTER COLUMN "gain" SET DATA TYPE DOUBLE PRECISION;
