@@ -6,6 +6,7 @@ import express from "express";
 import { deejaiRoutes } from "./routes";
 import mongoSanitize from "express-mongo-sanitize";
 import { KafkaConnection } from "./middlewares/kafka";
+import { run as SpotifyWatcher } from "./middlewares/spotify";
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ app.use("/api", deejaiRoutes());
 
 const kafka: KafkaConnection = new KafkaConnection();
 kafka.run();
-
+SpotifyWatcher();
 app.listen(API_PORT, () => {
   console.log(`API listening on port ${API_PORT}`);
 });

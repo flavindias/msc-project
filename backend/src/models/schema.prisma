@@ -101,7 +101,7 @@ model Track {
   name         String
   isrc         String         @unique
   artist       Artist         @relation(fields: [artistId], references: [id])
-  artistId     String         @unique
+  artistId     String         
   contributors Contributors[]
   room         RoomTracks[]
   deezer       DeezerTrack?

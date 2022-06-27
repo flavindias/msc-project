@@ -9,7 +9,7 @@ import {
 } from "kafkajs";
 dotenv.config();
 import { getRecommendation } from "./deezer";
-const { KAFKA_BROKERS, KAFKA_TOPICS } = process.env;
+const { KAFKA_BROKERS, KAFKA_TOPICS, KAFKA_SYNC_TOPICS } = process.env;
 
 export class KafkaConnection {
   private kafka: Kafka;
@@ -40,9 +40,12 @@ export class KafkaConnection {
     if (!KafkaConnection.instance) {
       KafkaConnection.instance = new KafkaConnection();
     }
-
     return KafkaConnection.instance;
-}
+  }
+
+  public static getKafka(): Kafka {
+    return KafkaConnection.getInstance().kafka;
+  }
 
   async subscribe(): Promise<void> {
     try {
@@ -67,12 +70,12 @@ export class KafkaConnection {
       console.error(error);
     }
   }
-  
+
   async run(): Promise<void> {
     try {
       await this.admin.connect();
 
-      const topics: ITopicConfig[] = `${KAFKA_TOPICS}`
+      const topics: ITopicConfig[] = `${KAFKA_TOPICS},${KAFKA_SYNC_TOPICS}`
         .split(",")
         .map((topic) => {
           return {
@@ -93,7 +96,7 @@ export class KafkaConnection {
           switch (topic) {
             case "deezer-login":
               const msg = message.value && JSON.parse(message.value.toString());
-              await getRecommendation(msg.token);
+              await getRecommendation(msg.token, msg.userId);
               break;
             default:
               break;

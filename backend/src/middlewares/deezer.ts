@@ -1,11 +1,31 @@
 import axios from "axios";
 import dotenv from "dotenv";
-import { getTrackByISRC as SpotifyISRC } from "./spotify";
-import { PrismaClient, Artist, DeezerArtist } from "@prisma/client";
+import { Partitioners } from "kafkajs";
+import { KafkaConnection } from "./kafka";
+import { PrismaClient } from "@prisma/client";
 dotenv.config();
 
 const { DEEZER_APP_ID, DEEZER_APP_SECRET } = process.env;
 const prisma = new PrismaClient();
+const kafka = KafkaConnection.getKafka();
+const deezerConsumer = kafka.consumer({ groupId: `deezer-group` });
+const deezerProducer = kafka.producer({
+  createPartitioner: Partitioners.LegacyPartitioner,
+});
+
+const publish = async (topic: string, data: string): Promise<void> => {
+  try {
+    await deezerProducer.connect();
+    await deezerProducer.send({
+      topic: topic,
+      messages: [{ value: data }],
+    });
+
+    await deezerProducer.disconnect();
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 export const getToken = async (code: string) => {
   try {
@@ -47,14 +67,14 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
       params: {
         access_token: accessToken,
       },
-    }); 
-    let artistId = '';
+    });
+    let artistId = "";
     const checkArtist = await prisma.deezerArtist.findUnique({
       where: {
         deezerId: response.data.artist.id,
       },
     });
-    if(checkArtist) artistId = checkArtist.artistId;
+    if (checkArtist) artistId = checkArtist.artistId;
 
     if (!checkArtist) {
       const checkArtistByName = await prisma.artist.findFirst({
@@ -73,8 +93,8 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
                 link: response.data.artist.link,
                 share: response.data.artist.share,
                 tracklist: response.data.artist.tracklist,
-              }
-            }
+              },
+            },
           },
         });
         artistId = newArtist.id;
@@ -113,7 +133,7 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
         data: {
           name: response.data.title,
           isrc: response.data.isrc,
-          
+
           deezer: {
             create: {
               deezerId: response.data.id,
@@ -132,9 +152,7 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
             connect: {
               id: artistId,
             },
-          }
-          
-         
+          },
         },
       });
       return newTrack;
@@ -166,10 +184,8 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
     return track;
   } catch (error) {
     console.log(error);
+    return error;
   }
-};
-export const getArtistInfo = () => {
-  console.log("getArtistInfo");
 };
 
 export const getTrackByISRC = async (token: string, isrc: string) => {
@@ -188,7 +204,7 @@ export const getTrackByISRC = async (token: string, isrc: string) => {
   }
 };
 
-export const getRecommendation = async (accessToken: string) => {
+export const getRecommendation = async (accessToken: string, userId: string) => {
   try {
     const response = await axios.get(
       "https://api.deezer.com/user/me/recommendations/tracks",
@@ -200,14 +216,55 @@ export const getRecommendation = async (accessToken: string) => {
     );
     const trackArr = response.data.data as RecommendationReturn[];
 
-    trackArr.forEach((song) => {
-      getTrackInfo(`${song.id}`, accessToken);
-    });
+    Promise.all(
+      trackArr.map(async (song) => {
+        const track = await getTrackInfo(`${song.id}`, accessToken) as {
+          id: string
+          name: string,
+          isrc: string,
+          artistId: string,
+          createdAt: Date,
+          updatedAt: Date
+        };
+        const userTrack = await prisma.userTracks.findFirst({
+          where: {
+            userId,
+            trackId: track.id,
+          },
+        });
+        if(!userTrack) {
+          await prisma.userTracks.create({
+            data: {
+              userId,
+              trackId: `${track.id}`,
+            },
+          });
+        }
+        console.log(track, "track.isrc");
+        const newTrack = await prisma.track.findUnique({
+          where: {
+            isrc: track.isrc,
+          },
+          include: {
+            deezer: true,
+            spotify: true,
+          },
+        });
+        if(newTrack && !newTrack?.spotify) {
+          await publish("spotify-new-track", JSON.stringify({
+            isrc: track.isrc,
+          }));
+        }
+      })
+    );
   } catch (err) {
     console.log(err);
   }
 };
 
+export const run = () => {
+  while (true) {}
+};
 export interface RecommendationReturn {
   id: number;
   readable: boolean;
