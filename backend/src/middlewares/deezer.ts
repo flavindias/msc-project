@@ -240,7 +240,6 @@ export const getRecommendation = async (accessToken: string, userId: string) => 
             },
           });
         }
-        console.log(track, "track.isrc");
         const newTrack = await prisma.track.findUnique({
           where: {
             isrc: track.isrc,

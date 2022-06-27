@@ -101,11 +101,11 @@ export class KafkaConnection {
             default:
               break;
           }
-          console.log({
-            topic,
-            partition,
-            value: message.value?.toString(),
-          });
+          // console.log({
+          //   topic,
+          //   partition,
+          //   value: message.value?.toString(),
+          // });
         },
       });
     } catch (error) {

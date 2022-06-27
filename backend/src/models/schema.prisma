@@ -137,7 +137,6 @@ model SpotifyTrack {
   popularity  Int
   previewUrl  String
   uri         String
-  trackNumber Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
 }
