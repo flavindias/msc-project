@@ -8,6 +8,7 @@ import {
   ITopicConfig,
 } from "kafkajs";
 dotenv.config();
+import { getTopTracks } from "./spotify";
 import { getRecommendation } from "./deezer";
 const { KAFKA_BROKERS, KAFKA_TOPICS, KAFKA_SYNC_TOPICS } = process.env;
 
@@ -97,6 +98,10 @@ export class KafkaConnection {
             case "deezer-login":
               const msg = message.value && JSON.parse(message.value.toString());
               await getRecommendation(msg.token, msg.userId);
+              break;
+            case "spotify-login":
+              const msg2 = message.value && JSON.parse(message.value.toString());
+              await getTopTracks(msg2.token, msg2.userId);
               break;
             default:
               break;

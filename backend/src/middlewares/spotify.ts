@@ -6,10 +6,18 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-export const getTrackInfo = async () => {
+export const getTopTracks = async (token: string, userId: string) => {
   try {
-    console.log("getTrackInfo");
-    const data = await axios.get(`https://api.spotify.com/v1/me/top/tracks`);
+    const data = await axios.get(`https://api.spotify.com/v1/me/top/tracks`, 
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        limit: 50,
+        offset: 0,
+      },
+    });
     console.log(data.data);
   } catch (error) {
     console.log(error);
