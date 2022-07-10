@@ -21,6 +21,7 @@ model User {
   memberRooms RoomUser[]   @relation("member")
   votes       RoomVotes[]  @relation("userVotes")
   tracks      UserTracks[]
+  isAdmin     Boolean      @default(false)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
 }

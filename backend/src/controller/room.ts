@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
-import { PrismaClient, User, SpotifyInfo, DeezerInfo } from "@prisma/client";
+import { RequestCustom } from "../types/requestCustom"; 
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export const RoomController = {
-  async list(req: Request, res: Response) {
+  async list(expressRequest: Request, res: Response) {
+    const req = expressRequest as RequestCustom;
     try {
+      console.log(req.user);
       const rooms = await prisma.room.findMany({
         include: {
           owner: true,
