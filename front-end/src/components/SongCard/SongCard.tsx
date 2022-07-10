@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { formatDistanceToNow } from "date-fns";
 
 const CardBg = styled.div`
   width: 100%;
@@ -35,7 +34,6 @@ const Title = styled.h1`
   color: #404040;
   vertical-align: middle;
 `;
-
 const ShareArea = styled.div`
   display: flex;
   flex-direction: row;
@@ -43,24 +41,12 @@ const ShareArea = styled.div`
   justify-content: space-between;
   vertical-align: middle;
 `;
-const UpdateInfo = styled.span`
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: #aeaeae;
-  vertical-align: middle;
-  margin-right: 1rem;
-  font-style: italic;
-`;
-const ShareIcon = styled.i`
+const ReactionIcon = styled.i`
   color: #42abc3;
   margin-left: 5px;
 `;
-const DownloadIcon = styled.i`
-  color: #42abc3;
-  margin-left: 5px;
-`;
-const RoomId = styled.span`
-  font-size: 0.5rem;
+const ISRC = styled.span`
+  font-size: 0.75rem;
   font-weight: 300;
   color: #aeaeae;
 `;
@@ -86,7 +72,7 @@ const ArtistImage = styled.img`
   margin-bottom: 0.5rem;
 `;
 const ArtistName = styled.span`
-  font-size: 0.5rem;
+  font-size: 1rem;
   font-weight: 300;
   color: #404040;
 `;
@@ -97,43 +83,13 @@ const CardFooter = styled.div`
   justify-content: space-between;
   margin-bottom: 1rem;
 `;
-const MembersArea = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  margin-right: 1rem;
-`;
 
-const OwnerImage = styled.img`
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  margin-right: -10px;
-`;
-const MemberImage = styled.img`
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  margin-right: 1rem;
-  margin-right: -10px;
-`;
-
-export const RoomCard = (props: {
-  title: string;
+export const SongCard = (props: {
+  isrc: string;
   id: string;
-  updatedAt: string;
+  name: string;
+  status: string;
   artists: {
-    id: string;
-    name: string;
-    image: string;
-  }[];
-  owner: {
-    id: string;
-    name: string;
-    image: string;
-  };
-  members: {
     id: string;
     name: string;
     image: string;
@@ -142,32 +98,30 @@ export const RoomCard = (props: {
   return (
     <CardBg>
       <TitleRow>
-        <Title>{props.title}</Title>
+        <Title>{props.name}</Title>
         <ShareArea>
-          <UpdateInfo>{`Updated ${
-            new Date(props.updatedAt) &&
-            formatDistanceToNow(new Date(props.updatedAt), { addSuffix: true })
-          }`}</UpdateInfo>
-          <ShareIcon className="fa-solid fa-share" />
-          <DownloadIcon className="fa-solid fa-cloud-arrow-down" />
+          <ReactionIcon
+            className={
+              props.status === "liked" ? "fas fa-thumbs-up" :(props.status === "disliked" ? "fas fa-thumbs-down" : "fa-solid fa-certificate")
+            }
+            style={
+                props.status === "liked"
+                    ? { color: "#42abc3" }
+                    : (props.status === "disliked" ? { color: "#f44336" } : { color: "#FFD700" })
+            }
+          />
         </ShareArea>
       </TitleRow>
       <ArtistsRow>
         {props.artists.map((artist, index) => (
           <ArtistElement key={index}>
-            <ArtistImage src={artist.image} alt={artist.name} />
+            <ArtistImage src={artist.image} />
             <ArtistName>{artist.name}</ArtistName>
           </ArtistElement>
         ))}
       </ArtistsRow>
       <CardFooter>
-        <RoomId>{`#${props.id}`}</RoomId>
-        <MembersArea>
-          <OwnerImage src={props.owner.image} alt={props.owner.name} />
-          {props.members.map((member, index) => (
-            <MemberImage key={index} src={member.image} alt={member.name} />
-          ))}
-        </MembersArea>
+        <ISRC>{`${props.isrc}`}</ISRC>
       </CardFooter>
     </CardBg>
   );
