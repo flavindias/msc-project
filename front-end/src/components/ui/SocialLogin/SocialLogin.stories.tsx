@@ -15,7 +15,6 @@ export default {
 const screen = {
   name: "Where’s your songs?",
 };
-const print = () => console.log("print");
 export const navbar: ComponentStory<typeof SocialLogin> = () => (
   <SocialLogin
     title={screen.name}

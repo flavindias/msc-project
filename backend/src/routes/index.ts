@@ -9,6 +9,7 @@ export const deejaiRoutes = () => {
     router.post('/auth/spotify', AuthController.spotify);
     router.post('/auth/deezer', AuthController.deezer);
     router.post('/auth/login', AuthController.login);
+    router.get('/auth/me', checkUser(), AuthController.me);
     router.get('/rooms', checkUser(), checkAdmin(false), RoomController.list);
     router.get('/rooms/:id', RoomController.get);
     router.post('/rooms', RoomController.create);

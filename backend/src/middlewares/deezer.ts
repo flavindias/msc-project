@@ -263,25 +263,25 @@ export const getRecommendation = async (accessToken: string, userId: string) => 
 
 export const run = async () => {
   try{
-    setInterval( async () => {
-      const user = await db.collection("deezerTokens").findOne();
-      console.log(user)
-      if (user) {
-        const tracks = await prisma.track.findMany({
-          where: {
-            deezer: null,
-          },
-          include: {
-            deezer: true,
-          },
-        });
-        Promise.all(
-          tracks.map(async (track) => {
-            await getTrackByISRC(track.isrc, user.token);
-          })
-        );
-      }
-    }, 30000);
+    // setInterval( async () => {
+    //   const user = await db.collection("deezerTokens").findOne();
+    //   console.log(user)
+    //   if (user) {
+    //     const tracks = await prisma.track.findMany({
+    //       where: {
+    //         deezer: null,
+    //       },
+    //       include: {
+    //         deezer: true,
+    //       },
+    //     });
+    //     Promise.all(
+    //       tracks.map(async (track) => {
+    //         await getTrackByISRC(track.isrc, user.token);
+    //       })
+    //     );
+    //   }
+    // }, 30000);
   } catch (err) {
     console.log(err);
   }

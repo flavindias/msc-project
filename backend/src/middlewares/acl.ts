@@ -32,6 +32,7 @@ export function decodeUserToken(header: string): string | undefined {
       id: string;
       iat: number;
     };
+    console.log(id);
     return id;
   } catch (err) {
     throw new Error("Permission Denied - Incorrect Token");
@@ -56,6 +57,7 @@ export const checkUser = () => {
     try {
       const req = expressRequest as RequestCustom;
       if (!req.headers.authorization) throw new Error("No token provided");
+      console.log(req.headers.authorization);
       const userId = decodeUserToken(req.headers.authorization);
       if (!userId) throw new Error("Permission Denied - No Token");
       const user = await prisma.user.findUnique({

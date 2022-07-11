@@ -231,24 +231,24 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
 
 export const run = async () => {
   try {
-    setInterval(async () => {
-      const user = await db.collection("spotifyTokens").findOne();
-      if (user) {
-        const tracks = await prisma.track.findMany({
-          where: {
-            spotify: null,
-          },
-          include: {
-            spotify: true,
-          },
-        });
-        Promise.all(
-          tracks.map(async (track) => {
-            await getTrackByISRC(track.isrc, user.token);
-          })
-        );
-      }
-    }, 30000);
+    // setInterval(async () => {
+    //   const user = await db.collection("spotifyTokens").findOne();
+    //   if (user) {
+    //     const tracks = await prisma.track.findMany({
+    //       where: {
+    //         spotify: null,
+    //       },
+    //       include: {
+    //         spotify: true,
+    //       },
+    //     });
+    //     Promise.all(
+    //       tracks.map(async (track) => {
+    //         await getTrackByISRC(track.isrc, user.token);
+    //       })
+    //     );
+    //   }
+    // }, 30000);
   } catch (error) {
     console.error(error);
   }

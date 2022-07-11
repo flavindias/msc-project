@@ -92,28 +92,28 @@ export class KafkaConnection {
       await this.producer.connect();
       await this.consumer.connect();
       await this.subscribe();
-      await this.consumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-          switch (topic) {
-            case "deezer-login":
-              const msg = message.value && JSON.parse(message.value.toString());
-              await getRecommendation(msg.token, msg.userId);
-              break;
-            case "spotify-login":
-              const msg2 = message.value && JSON.parse(message.value.toString());
-              console.log(msg2, "msg2");
-              await getTopTracks(msg2.token, msg2.userId);
-              break;
-            default:
-              break;
-          }
-          // console.log({
-          //   topic,
-          //   partition,
-          //   value: message.value?.toString(),
-          // });
-        },
-      });
+      // await this.consumer.run({
+      //   eachMessage: async ({ topic, partition, message }) => {
+      //     switch (topic) {
+      //       case "deezer-login":
+      //         const msg = message.value && JSON.parse(message.value.toString());
+      //         await getRecommendation(msg.token, msg.userId);
+      //         break;
+      //       case "spotify-login":
+      //         const msg2 = message.value && JSON.parse(message.value.toString());
+      //         console.log(msg2, "msg2");
+      //         await getTopTracks(msg2.token, msg2.userId);
+      //         break;
+      //       default:
+      //         break;
+      //     }
+      //     // console.log({
+      //     //   topic,
+      //     //   partition,
+      //     //   value: message.value?.toString(),
+      //     // });
+      //   },
+      // });
     } catch (error) {
       console.error(error);
     }

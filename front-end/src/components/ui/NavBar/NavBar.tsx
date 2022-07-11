@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const NavContainer = styled.header`
   width: 100%;
   height: 64px;
@@ -55,6 +56,15 @@ const Role = styled.span`
   font-weight: 300;
   color: #aeaeae;
 `;
+
+const logout = () => {
+  localStorage.removeItem("deezerToken");
+  localStorage.removeItem("spotifyToken");
+  localStorage.removeItem("deejaiToken");
+  window.location.reload();
+}
+
+
 export const NavBar = (props: {
   logo: string;
   user: {
@@ -63,13 +73,14 @@ export const NavBar = (props: {
     photo: string;
   } | null;
 }) => {
+  
   return (
     <NavContainer>
       <LogoContainer>
         <LogoImage src={props.logo} alt="logo" />
       </LogoContainer>
       {props.user && (
-        <UserContainer>
+        <UserContainer onClick={() => logout()}>
           <NameContainer>
             <Name>{props.user.name}</Name>
             <Role>{props.user.role}</Role>
