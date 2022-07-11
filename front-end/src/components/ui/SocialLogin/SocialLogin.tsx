@@ -9,6 +9,10 @@ const CardContainer = styled.div`
   border-radius: 8px;
   background-color: white;
   padding: 1rem;
+  @media (max-width: 768px) {
+    width: 80%;
+    flex-direction: column;
+  }
 `;
 
 const CardTitle = styled.h1`
@@ -23,12 +27,17 @@ const StreammingRow = styled.div`
   margin-bottom: 1rem;
   align-items: center;
   justify-content: space-evenly;
+  
 `;
 const StreamingElement = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: column;
+  }
 `;
 const SpotifyContainer = styled.div`
   display: flex;
@@ -39,6 +48,9 @@ const SpotifyContainer = styled.div`
   margin-top: 1rem;
   background-color: #1db954;
   border-radius: 8px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const SpotifyIcon = styled.i`
   color: #fff;
@@ -65,6 +77,9 @@ const DeezerContainer = styled.div`
   margin-top: 1rem;
   background-color: #00c7f2;
   border-radius: 8px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const DeezerIcon = styled.i`
   color: #fff;

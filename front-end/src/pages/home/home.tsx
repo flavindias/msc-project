@@ -11,22 +11,36 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-image: url("https://images.pexels.com/photos/1044990/pexels-photo-1044990.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+  background-repeat: no-repeat;
+  background-size: cover;
+  justify-content: center;
+  align-items: center;
+  @media (max-width: 768px) {
+    align-items: center;
+  }
 `;
 
 const Content = styled.div`
-  width: 100%;
+  width: 80%;
   height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
-  background-image: url("https://images.pexels.com/photos/1044990/pexels-photo-1044990.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
-  background-repeat: no-repeat;
-  background-size: cover;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+  }
 `;
 
 const Caption = styled.div`
   color: #fff;
+  @media (max-width: 768px) {
+    width: 80%;
+    text-align: center;
+  }
 `;
 const Title = styled.h1`
   font-size: 2.5rem;
