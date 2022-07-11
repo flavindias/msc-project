@@ -39,6 +39,13 @@ const SubTitle = styled.h2`
   font-weight: 400;
 `;
 
+const spotifyLogin = () => {
+  console.log("spotifyLogin");
+}
+const deezerLogin = () => {
+  console.log("deezerLogin");
+}
+
 export const HomePage = () => {
   return (
     <Container>
@@ -50,7 +57,7 @@ export const HomePage = () => {
             Invite people to your party and relax, we bring the songs.
           </SubTitle>
         </Caption>
-        <SocialLogin title="Where’s your songs?" />
+        <SocialLogin title="Where’s your songs?"  />
       </Content>
     </Container>
   );
