@@ -1,17 +1,18 @@
-import API from './api';
+import axios from 'axios';
 
 export const isAuthenticated = () => {
-	const token = localStorage.getItem('deejai-token');
-	if (token) {
+	const spotifyToken = localStorage.getItem('spotifyToken');
+	const deezerToken = localStorage.getItem('deezerToken');
+	if (deezerToken || spotifyToken) {
 		return true;
 	}
 	return false;
 };
 
 export const getToken = () => {
-	const token = localStorage.getItem('deejai-token');
-	if (token) {
-		return token;
+	const deejaiToken = localStorage.getItem('deejaiToken');
+	if (deejaiToken) {
+		return deejaiToken;
 	}
 	return null;
 };
@@ -19,7 +20,7 @@ export const getToken = () => {
 export const getUser = () => {
 	const token = getToken();
 	if (token) {
-		return API.get('/me');
+		// return API.get('/me');
 	}
 };
 
