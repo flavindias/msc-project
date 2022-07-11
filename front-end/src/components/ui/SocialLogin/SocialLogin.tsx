@@ -82,7 +82,7 @@ const DeezerTitle = styled.h1`
   font-family: "Montserrat", sans-serif;
   font-weight: 400;
 `;
-export const SocialLogin = (props: { title: string }) => {
+export const SocialLogin = (props: { title: string, spotifyLogin: Function }) => {
   return (
     <CardContainer>
       <CardTitle>{props.title}</CardTitle>

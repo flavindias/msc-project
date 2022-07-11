@@ -11,7 +11,7 @@ import {
 import reportWebVitals from "./reportWebVitals";
 import { HomePage } from "./pages/home/home";
 import { NavBar } from "./components/ui/NavBar/NavBar";
-
+import { RoomList } from "./pages/rooms/list";
 const AppContainer = styled.div`
   display: flex;
   align-items: center;
@@ -54,9 +54,9 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<HomePage />} />
-	  <Route element={<WithNavLayout />}>
-		<Route path={routes.rooms} element={<HomePage />} />
-	  </Route>
+      <Route element={<WithNavLayout />}>
+        <Route path={routes.rooms} element={<RoomList />} />
+      </Route>
     </Routes>
   </BrowserRouter>
 );
