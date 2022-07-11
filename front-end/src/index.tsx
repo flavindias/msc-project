@@ -54,6 +54,7 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path={routes.login} element={<HomePage />} />
       <Route element={<WithNavLayout />}>
         <Route path={routes.rooms} element={<RoomList />} />
       </Route>

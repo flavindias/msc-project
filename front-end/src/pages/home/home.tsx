@@ -1,5 +1,7 @@
 import React from "react";
+import { addHours } from "date-fns";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
 import { NavBar } from "../../components/ui/NavBar/NavBar";
 import { SocialLogin } from "../../components/ui/SocialLogin/SocialLogin";
 const Container = styled.div`
@@ -39,14 +41,19 @@ const SubTitle = styled.h2`
   font-weight: 400;
 `;
 
-const spotifyLogin = () => {
-  console.log("spotifyLogin");
-}
-const deezerLogin = () => {
-  console.log("deezerLogin");
-}
+const useQuery = () => {
+  const { hash } = useLocation();
+  const token = hash.split("&")[0].split("=").at(1);
+  if (token)
+    window.localStorage.setItem(
+      "spotifyToken",
+      JSON.stringify({ token, expires: addHours(new Date(), 1) })
+    );
+  return React.useMemo(() => new URLSearchParams(hash), [hash]);
+};
 
 export const HomePage = () => {
+  useQuery();
   return (
     <Container>
       <NavBar logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"} user={null} />
@@ -57,7 +64,7 @@ export const HomePage = () => {
             Invite people to your party and relax, we bring the songs.
           </SubTitle>
         </Caption>
-        <SocialLogin title="Where’s your songs?"  />
+        <SocialLogin title="Where’s your songs?" />
       </Content>
     </Container>
   );

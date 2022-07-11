@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import styled from "styled-components";
 
 const CardContainer = styled.div`
@@ -82,13 +83,23 @@ const DeezerTitle = styled.h1`
   font-family: "Montserrat", sans-serif;
   font-weight: 400;
 `;
-export const SocialLogin = (props: { title: string, spotifyLogin: Function }) => {
+
+const login = () => {
+  console.log("login")
+  const client_id = "8e50fa5257fe4537b86253accb36a7fc";
+  const redirect_uri = "http://localhost:3000/login";
+  const scope = "user-read-private user-read-email";
+  const response_type = "token";
+  const url = `https://accounts.spotify.com/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}`;
+  window.location.href = url;
+};
+export const SocialLogin = (props: { title: string }) => {
   return (
     <CardContainer>
       <CardTitle>{props.title}</CardTitle>
       <StreammingRow>
         <StreamingElement>
-          <SpotifyContainer>
+          <SpotifyContainer onClick={() => login()}>
             <SpotifyIcon className="fa-brands fa-spotify" />
             <SpotifyTitle>{"Spotify"}</SpotifyTitle>
           </SpotifyContainer>
