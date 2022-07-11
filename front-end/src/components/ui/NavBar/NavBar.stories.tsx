@@ -13,7 +13,7 @@ export default {
 
 const user = {
 	name: 'John Doe',
-	role: 'Admin',
+	player: 'Player Name',
 	photo: 'https://randomuser.me/api/portraits/men/7.jpg',
 };
 export const navbar: ComponentStory<typeof NavBar> = () => (

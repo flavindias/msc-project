@@ -13,7 +13,7 @@ import reportWebVitals from "./reportWebVitals";
 import { HomePage } from "./pages/home/home";
 import { NavBar } from "./components/ui/NavBar/NavBar";
 import { RoomList } from "./pages/rooms/list";
-import { isAuthenticated } from "./utils/auth";
+import { isAuthenticated, getDeejaiToken } from "./utils/auth";
 
 const AppContainer = styled.div`
   display: flex;
@@ -31,18 +31,18 @@ const routes = {
 
 const getUser = async () => {
   try {
-    const saved = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
+    
     const { data } = await axios.get("http://localhost:3001/api/auth/me", {
       headers: {
-        Authorization: `Bearer ${saved.token}`,
+        Authorization: `Bearer ${getDeejaiToken().token}`,
       },
     });
     const { user } = data;
     const userData = {
       name: user.name,
-      role: user.isAdmin ? "Admin" : "User",
-      photo: user.spottfy
-        ? user.spottfy.picture
+      player: user.email,
+      photo: user.spotify
+        ? user.spotify.picture
         : user.deezer
         ? user.deezer.picture
         : "https://randomuser.me/api/portraits/men/8.jpg",
@@ -57,7 +57,7 @@ const WithNavLayout = () => {
   const authenticated = isAuthenticated();
   const [user, setUser] = useState({
     name: "Pedro Dias",
-    role: "Admin",
+    player: "My Player Name",
     photo: "https://randomuser.me/api/portraits/men/7.jpg",
   });
   useEffect(() => {

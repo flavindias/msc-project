@@ -1,6 +1,5 @@
 import axios from "axios";
 import dotenv from "dotenv";
-import { sign } from "jsonwebtoken";
 import db from "../middlewares/mongo";
 import { encodeUserToken } from "../middlewares/acl";
 import { Request, Response } from "express";

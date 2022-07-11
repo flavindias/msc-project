@@ -1,10 +1,230 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import styled from "styled-components";
+import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
+import { PageHeader } from "../../components/ui/PageTitle/PageHeader";
+import { getDeejaiToken } from "../../utils/auth";
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  justify-content: center;
+  align-items: center;
+`;
+const Content = styled.div`
+  display: flex;
+  width: 80%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 80%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+const TitleText = styled.h1`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #70a9c7;
+  margin-left: 1rem;
+  margin-right: 1rem;
+`;
+const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+`;
+const SyncIcon = styled.i`
+  font-size: 1.5rem;
+  color: #70a9c7;
+  margin-right: 1rem;
+`;
+
+const SyncButton = styled.div`
+  background: #ffffff;
+  border: 1px solid #70a9c7;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #70a9c7;
+  margin-right: 1rem;
+  cursor: pointer;
+  &:hover {
+    background: #fafafa;
+    color: #70a9c7;
+  }
+`;
+const SyncText = styled.span`
+  font-size: 0.8rem;
+  margin-bottom: 0.7rem;
+  font-weight: 300;
+  color: #70a9c7;
+`;
+
+const FilterButton = styled.div`
+  background: #ffffff;
+  border: 1px solid #70a9c7;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #70a9c7;
+  margin-right: 1rem;
+  cursor: pointer;
+  &:hover {
+    background: #fafafa;
+    color: #70a9c7;
+  }
+`;
+
+const FilterText = styled.span`
+  font-size: 0.8rem;
+  margin-bottom: 0.7rem;
+  font-weight: 300;
+  color: #70a9c7;
+`;
+const FilterIcon = styled.i`
+  font-size: 1.5rem;
+  color: #70a9c7;
+  margin-right: 1rem;
+`;
+
 
 export const RoomList = () => {
-    return (
-        <div>
-            <h1>RoomList</h1>
-        </div>
-    );
+  const [rooms, setRooms] = useState([]);
+  const fetchRemoteRooms = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:3001/api/rooms", {
+        headers: {
+          Authorization: `Bearer ${getDeejaiToken().token}`,
+        },
+      });
+      console.log(data, "fetchRemoteRooms");
+
+      setRooms(
+        data.map(
+          (room: {
+            tracks: any;
+            id: any;
+            name: any;
+            updatedAt: any;
+            owner: {
+              id: any;
+              name: any;
+              spotify: { picture: any };
+              deezer: { picture: any };
+            };
+            users: {
+              id: any;
+              name: any;
+              spotify: { picture: any };
+              deezer: { picture: any };
+            }[];
+          }) => {
+            const artists = room.tracks.map(
+              (track: {
+                Track: { artist: { id: any; name: any; picture: any } };
+              }) => {
+                console.log(track.Track.artist, "track.Track[0].artist");
+                return {
+                  id: track.Track.artist.id,
+                  name: track.Track.artist.name,
+                  image: track.Track.artist.picture
+                    ? track.Track.artist.picture
+                    : "https://via.placeholder.com/150",
+                };
+              }
+            );
+            return {
+              id: room.id,
+              name: room.name,
+              updatedAt: room.updatedAt,
+              artists,
+              owner: {
+                id: room.owner.id,
+                name: room.owner.name,
+                image: room.owner.spotify
+                  ? room.owner.spotify.picture
+                  : room.owner.deezer
+                  ? room.owner.deezer.picture
+                  : "https://randomuser.me/api/portraits/men/8.jpg",
+              },
+              members: room.users.map(
+                (member: {
+                  id: any;
+                  name: any;
+                  spotify: { picture: any };
+                  deezer: { picture: any };
+                }) => {
+                  return {
+                    id: member.id,
+                    name: member.name,
+                    image: member.spotify
+                      ? member.spotify.picture
+                      : member.deezer
+                      ? member.deezer.picture
+                      : "https://randomuser.me/api/portraits/men/8.jpg",
+                  };
+                }
+              ),
+            };
+          }
+        )
+      );
+    } catch (err) {
+      console.log(err);
     }
+  };
+  useEffect(() => {
+    async function fetchRooms() {
+      await fetchRemoteRooms();
+    }
+    fetchRooms();
+  }, []);
+  return (
+    <Container>
+      <TitleContainer>
+      <TitleText>{"Rooms"}</TitleText>
+      <ActionsContainer>
+        <SyncButton>
+          <SyncIcon className="fa-solid fa-arrows-rotate" />
+          <SyncText>Sync</SyncText>
+        </SyncButton>
+        <FilterButton>
+          <FilterIcon className="fa-solid fa-filter" />
+          <FilterText>Filter</FilterText>
+        </FilterButton>
+      </ActionsContainer>
+    </TitleContainer>
+      <Content>
+        {rooms.map((room) => {
+          const { members, owner, name, id, updatedAt, artists } = room;
+          return (
+            <RoomCard
+              key={id}
+              artists={artists}
+              members={members}
+              owner={owner}
+              title={name}
+              id={id}
+              updatedAt={updatedAt}
+            />
+          );
+        })}
+      </Content>
+    </Container>
+  );
+};

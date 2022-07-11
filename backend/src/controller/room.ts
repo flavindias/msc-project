@@ -8,15 +8,80 @@ export const RoomController = {
   async list(expressRequest: Request, res: Response) {
     const req = expressRequest as RequestCustom;
     try {
-      console.log(req.user);
-      const rooms = await prisma.room.findMany({
-        include: {
-          owner: true,
-          users: true,
+      const roomsOwner = await prisma.room.findMany({
+        where: {
+          ownerId: req.user.id,
         },
-      });''
+        include: {
+          tracks: {
+            include: {
+              Track: {
+                include: {
+                  artist: true,
+                  contributors: true,
+                }
+              }
+            }
+          },
+          owner: {
+            include: {
+              spotify: true,
+              deezer: true,
+            }
+          },
+          users: {
+            include: {
+              user: {
+                include: {
+                  spotify: true,
+                  deezer: true,
+                }
+              }
+            }
+          }
+        },
+      });
+      const roomsMember = await prisma.room.findMany({
+        where: {
+          users: {
+            some: {
+              id: req.user.id,
+            },
+          },
+        },
+        include: {
+          tracks: {
+            include: {
+              Track: {
+                include: {
+                  artist: true,
+                  contributors: true,
+                }
+              }
+            }
+          },
+          owner: {
+            include: {
+              spotify: true,
+              deezer: true,
+            }
+          },
+          users: {
+            include: {
+              user: {
+                include: {
+                  spotify: true,
+                  deezer: true,
+                }
+              }
+            }
+          }
+        },
+      });
+      const rooms = [...roomsOwner, ...roomsMember];
       res.json(rooms);
     } catch (err) {
+      console.log(err);
       res.status(500).json({
         message: err,
       });

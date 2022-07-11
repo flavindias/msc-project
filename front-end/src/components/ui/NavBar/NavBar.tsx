@@ -1,7 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 const NavContainer = styled.header`
   width: 100%;
   height: 64px;
@@ -69,7 +67,7 @@ export const NavBar = (props: {
   logo: string;
   user: {
     name: string;
-    role: string;
+    player: string;
     photo: string;
   } | null;
 }) => {
@@ -83,7 +81,7 @@ export const NavBar = (props: {
         <UserContainer onClick={() => logout()}>
           <NameContainer>
             <Name>{props.user.name}</Name>
-            <Role>{props.user.role}</Role>
+            <Role>{props.user.player}</Role>
           </NameContainer>
           <ProfileImage src={props.user.photo} alt="user" />
         </UserContainer>

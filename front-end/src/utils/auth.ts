@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 export const isAuthenticated = () => {
 	const spotifyToken = localStorage.getItem('spotifyToken');
 	const deezerToken = localStorage.getItem('deezerToken');
@@ -25,3 +23,7 @@ export const getUser = () => {
 };
 
 
+
+export const getDeejaiToken = () => {
+	return JSON.parse(`${localStorage.getItem("deejaiToken")}`)
+};
