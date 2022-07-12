@@ -99,12 +99,13 @@ const ProfileName = styled.span`
   font-size: 0.5rem;
   font-weight: 300;
   color: #404040;
+  text-align: center;
 `;
 
 const SongContainer = styled.div`
   display: flex;
   flex-direction: row;
-  width: 80%;
+  width: 100%;
   max-width: 100%;
   margin-top: 1rem;
   margin-bottom: 1rem;

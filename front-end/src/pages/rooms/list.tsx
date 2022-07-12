@@ -139,10 +139,12 @@ export const RoomList = () => {
               deezer: { picture: any };
             };
             users: {
-              id: any;
-              name: any;
-              spotify: { picture: any };
-              deezer: { picture: any };
+              user: {
+                id: string;
+                name: string;
+                spotify: { picture: string };
+                deezer: { picture: string };
+              };
             }[];
           }) => {
             const artists = room.tracks.map(
@@ -158,6 +160,8 @@ export const RoomList = () => {
                 };
               }
             );
+            const members = room.users.map((member) => member.user)
+            
             return {
               id: room.id,
               name: room.name,
@@ -172,13 +176,9 @@ export const RoomList = () => {
                   ? room.owner.deezer.picture
                   : "https://randomuser.me/api/portraits/men/8.jpg",
               },
-              members: room.users.map(
-                (member: {
-                  id: any;
-                  name: any;
-                  spotify: { picture: any };
-                  deezer: { picture: any };
-                }) => {
+              members: members.map(
+                (member) => {
+                  console.log(member);
                   return {
                     id: member.id,
                     name: member.name,

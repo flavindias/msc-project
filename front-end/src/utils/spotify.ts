@@ -63,7 +63,7 @@ export const getTopTracks = async () => {
           Authorization: `Bearer ${stored.token}`,
         },
         params: {
-          limit: 5,
+          limit: 50,
           offset: 0,
         },
       }

@@ -19,6 +19,7 @@ export const SpotifyController = {
           isrc,
         },
       });
+      console.log(searchTrack, "searchTrack");
       if(!searchTrack) {
         const track = await getTrackByISRC(isrc, token);
         if (track) {
@@ -36,6 +37,9 @@ export const SpotifyController = {
                   },
                 },
               });
+        }
+        else{
+          throw new Error("Track not found");
         }
       }
       else{
