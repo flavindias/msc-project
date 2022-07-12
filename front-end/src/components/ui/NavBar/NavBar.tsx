@@ -59,6 +59,7 @@ const logout = () => {
   localStorage.removeItem("deezerToken");
   localStorage.removeItem("spotifyToken");
   localStorage.removeItem("deejaiToken");
+  localStorage.removeItem("platform");
   window.location.reload();
 }
 

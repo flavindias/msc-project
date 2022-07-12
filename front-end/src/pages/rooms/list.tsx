@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
-import { PageHeader } from "../../components/ui/PageTitle/PageHeader";
 import { getDeejaiToken } from "../../utils/auth";
+import { getRecommendations } from "../../utils/deezer";
+import { getTopTracks } from "../../utils/spotify";
+import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
 
 const Container = styled.div`
   display: flex;
@@ -15,6 +16,7 @@ const Container = styled.div`
 const Content = styled.div`
   display: flex;
   width: 80%;
+  flex-direction: column;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -102,6 +104,16 @@ const FilterIcon = styled.i`
   margin-right: 1rem;
 `;
 
+const sync = async () => {
+  const platform = JSON.parse(`${localStorage.getItem("platform")}`);
+  
+  if (platform.name === "deezer") {
+    await getRecommendations();
+  }
+  else if (platform.name === "spotify") {
+    await getTopTracks();
+  }
+};
 
 export const RoomList = () => {
   const [rooms, setRooms] = useState([]);
@@ -112,7 +124,6 @@ export const RoomList = () => {
           Authorization: `Bearer ${getDeejaiToken().token}`,
         },
       });
-      console.log(data, "fetchRemoteRooms");
 
       setRooms(
         data.map(
@@ -138,7 +149,6 @@ export const RoomList = () => {
               (track: {
                 Track: { artist: { id: any; name: any; picture: any } };
               }) => {
-                console.log(track.Track.artist, "track.Track[0].artist");
                 return {
                   id: track.Track.artist.id,
                   name: track.Track.artist.name,
@@ -197,18 +207,18 @@ export const RoomList = () => {
   return (
     <Container>
       <TitleContainer>
-      <TitleText>{"Rooms"}</TitleText>
-      <ActionsContainer>
-        <SyncButton>
-          <SyncIcon className="fa-solid fa-arrows-rotate" />
-          <SyncText>Sync</SyncText>
-        </SyncButton>
-        <FilterButton>
-          <FilterIcon className="fa-solid fa-filter" />
-          <FilterText>Filter</FilterText>
-        </FilterButton>
-      </ActionsContainer>
-    </TitleContainer>
+        <TitleText>{"Rooms"}</TitleText>
+        <ActionsContainer>
+          <SyncButton onClick={() => sync()}>
+            <SyncIcon className="fa-solid fa-arrows-rotate" />
+            <SyncText>Sync</SyncText>
+          </SyncButton>
+          <FilterButton>
+            <FilterIcon className="fa-solid fa-filter" />
+            <FilterText>Filter</FilterText>
+          </FilterButton>
+        </ActionsContainer>
+      </TitleContainer>
       <Content>
         {rooms.map((room) => {
           const { members, owner, name, id, updatedAt, artists } = room;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import ReactDOM from "react-dom/client";
 import styled from "styled-components";
 import {
@@ -13,7 +12,8 @@ import reportWebVitals from "./reportWebVitals";
 import { HomePage } from "./pages/home/home";
 import { NavBar } from "./components/ui/NavBar/NavBar";
 import { RoomList } from "./pages/rooms/list";
-import { isAuthenticated, getDeejaiToken } from "./utils/auth";
+import { RoomView } from "./pages/rooms/view";
+import { isAuthenticated, getUser } from "./utils/auth";
 
 const AppContainer = styled.div`
   display: flex;
@@ -29,29 +29,7 @@ const routes = {
   room: "/rooms/:id",
 };
 
-const getUser = async () => {
-  try {
-    
-    const { data } = await axios.get("http://localhost:3001/api/auth/me", {
-      headers: {
-        Authorization: `Bearer ${getDeejaiToken().token}`,
-      },
-    });
-    const { user } = data;
-    const userData = {
-      name: user.name,
-      player: user.email,
-      photo: user.spotify
-        ? user.spotify.picture
-        : user.deezer
-        ? user.deezer.picture
-        : "https://randomuser.me/api/portraits/men/8.jpg",
-    };
-    return userData;
-  } catch (err) {
-    console.log(err);
-  }
-};
+
 
 const WithNavLayout = () => {
   const authenticated = isAuthenticated();
@@ -90,6 +68,7 @@ root.render(
       <Route path={routes.login} element={<HomePage />} />
       <Route element={<WithNavLayout />}>
         <Route path={routes.rooms} element={<RoomList />} />
+        <Route path={routes.room} element={<RoomView />} />
       </Route>
     </Routes>
   </BrowserRouter>

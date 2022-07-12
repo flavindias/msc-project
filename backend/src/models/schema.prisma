@@ -102,7 +102,7 @@ model Track {
   name         String
   isrc         String         @unique
   artist       Artist         @relation(fields: [artistId], references: [id])
-  artistId     String         
+  artistId     String
   contributors Contributors[]
   room         RoomTracks[]
   deezer       DeezerTrack?
@@ -130,16 +130,16 @@ model DeezerTrack {
 }
 
 model SpotifyTrack {
-  track       Track    @relation(fields: [trackId], references: [id])
-  trackId     String   @unique
-  spotifyId   String   @unique
-  href        String
-  isLocal     Boolean
-  popularity  Int
-  previewUrl  String?
-  uri         String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
+  track      Track    @relation(fields: [trackId], references: [id])
+  trackId    String   @unique
+  spotifyId  String   @unique
+  href       String
+  isLocal    Boolean
+  popularity Int
+  previewUrl String?
+  uri        String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 }
 
 model UserTracks {
@@ -160,6 +160,8 @@ model Room {
   ownerId   String
   users     RoomUser[]
   tracks    RoomTracks[]
+  deejai    Boolean      @default(true)
+  isPrivate Boolean      @default(false)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @default(now())
 
@@ -177,11 +179,11 @@ model RoomTracks {
 }
 
 model RoomUser {
-  id     String @id @default(cuid())
-  user   User   @relation("member", fields: [userId], references: [id])
-  userId String
-  room   Room   @relation(fields: [roomId], references: [id])
-  roomId String
+  id        String   @id @default(cuid())
+  user      User     @relation("member", fields: [userId], references: [id])
+  userId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }

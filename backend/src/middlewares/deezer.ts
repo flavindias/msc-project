@@ -83,9 +83,11 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
         },
       });
       if (!checkArtistByName) {
+        console.log( response.data.artist, "artist");
         const newArtist = await prisma.artist.create({
           data: {
             name: response.data.artist.name,
+            picture: response.data.artist.picture_xl,
             deezer: {
               create: {
                 deezerId: response.data.artist.id,

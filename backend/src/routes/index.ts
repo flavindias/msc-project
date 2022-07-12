@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { checkUser, checkAdmin } from '../middlewares/acl';
 import { AuthController } from '../controller/auth';
 import { RoomController } from '../controller/room';
+import { DeezerController } from '../controller/deezer';
 const router = Router();
 
 export const deejaiRoutes = () => {
@@ -11,8 +12,9 @@ export const deejaiRoutes = () => {
     router.post('/auth/login', AuthController.login);
     router.get('/auth/me', checkUser(), AuthController.me);
     router.get('/rooms', checkUser(), checkAdmin(false), RoomController.list);
-    router.get('/rooms/:id', RoomController.get);
-    router.post('/rooms', RoomController.create);
+    router.get('/rooms/:id', checkUser(), RoomController.get);
+    router.post('/rooms', checkUser(), RoomController.create);
     router.post('/rooms/:id/join', RoomController.join);
+    router.get('/deezer/recommendation', checkUser(), DeezerController.getRecommendation);
     return router;
 };

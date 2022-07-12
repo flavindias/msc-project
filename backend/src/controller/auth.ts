@@ -133,7 +133,7 @@ export const AuthController = {
         link: response.data.link,
         picture: response.data.picture_medium,
       };
-
+      console.log(deezer)
       if (!user) {
         userResponse = await prisma.user.create({
           data: {
@@ -151,7 +151,7 @@ export const AuthController = {
       } else {
         userResponse = user;
       }
-
+      console.log(userResponse)
       if (!user.deezer) {
         userResponse = await prisma.user.update({
           where: {

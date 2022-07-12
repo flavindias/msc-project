@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 
 const CardBg = styled.div`
@@ -139,8 +140,10 @@ export const RoomCard = (props: {
     image: string;
   }[];
 }) => {
+  const navigate = useNavigate();
+  const showArtists = props.artists.slice(0, 8);
   return (
-    <CardBg>
+    <CardBg onClick={() => navigate(`/rooms/${props.id}`)}>
       <TitleRow>
         <Title>{props.title}</Title>
         <ShareArea>
@@ -153,7 +156,7 @@ export const RoomCard = (props: {
         </ShareArea>
       </TitleRow>
       <ArtistsRow>
-        {props.artists.map((artist, index) => (
+        {showArtists.map((artist, index) => (
           <ArtistElement key={index}>
             <ArtistImage src={artist.image} alt={artist.name} />
             <ArtistName>{artist.name}</ArtistName>

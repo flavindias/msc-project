@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { RequestCustom } from "../types/requestCustom"; 
+import { RequestCustom } from "../types/requestCustom";
 
 const prisma = new PrismaClient();
 
@@ -19,15 +19,15 @@ export const RoomController = {
                 include: {
                   artist: true,
                   contributors: true,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           owner: {
             include: {
               spotify: true,
               deezer: true,
-            }
+            },
           },
           users: {
             include: {
@@ -35,10 +35,10 @@ export const RoomController = {
                 include: {
                   spotify: true,
                   deezer: true,
-                }
-              }
-            }
-          }
+                },
+              },
+            },
+          },
         },
       });
       const roomsMember = await prisma.room.findMany({
@@ -56,15 +56,15 @@ export const RoomController = {
                 include: {
                   artist: true,
                   contributors: true,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           owner: {
             include: {
               spotify: true,
               deezer: true,
-            }
+            },
           },
           users: {
             include: {
@@ -72,10 +72,10 @@ export const RoomController = {
                 include: {
                   spotify: true,
                   deezer: true,
-                }
-              }
-            }
-          }
+                },
+              },
+            },
+          },
         },
       });
       const rooms = [...roomsOwner, ...roomsMember];
@@ -87,19 +87,40 @@ export const RoomController = {
       });
     }
   },
-  async create(req: Request, res: Response) {
+  async create(expressRequest: Request, res: Response) {
     try {
-      const { name, userId } = req.body;
+      const req = expressRequest as RequestCustom;
+      const { name, isPrivate, deejai } = req.body;
+
       const room = await prisma.room.create({
         data: {
           name,
+          isPrivate: !!isPrivate,
+          deejai: !!deejai,
           owner: {
             connect: {
-              id: userId,
+              id: req.user.id,
             },
           },
         },
       });
+      if (!!deejai) {
+        const tracks = await prisma.userTracks.findMany({
+          where: {
+            userId: req.user.id,
+          },
+        });
+        const tracksToAdd = tracks.map((track) => {
+          return {
+            roomId: room.id,
+            trackId: track.trackId,
+          };
+        });
+
+        await prisma.roomTracks.createMany({
+          data: tracksToAdd,
+        });
+      }
       res.status(201).json({
         message: "Room created",
         room,
@@ -110,16 +131,35 @@ export const RoomController = {
       });
     }
   },
-  async get(req: Request, res: Response) {
+  async get(expressRequest: Request, res: Response) {
     try {
+      const req = expressRequest as RequestCustom;
       const { id } = req.params;
       const room = await prisma.room.findUnique({
         where: {
           id,
         },
+        include: {
+          users: true,
+          tracks: {
+            include: {
+              Track: {
+                include: {
+                  artist: true,
+                  contributors: true,
+                },
+              },
+            },
+          },
+        },
       });
+      if (!room) throw new Error("Room not found");
+      if (
+        room.ownerId !== req.user.id &&
+        !room.users.some((user) => user.userId === req.user.id)
+      )
+        throw new Error("You are not allowed to access this room");
       res.status(200).json({
-        message: "Room found",
         room,
       });
     } catch (err) {
@@ -128,16 +168,12 @@ export const RoomController = {
       });
     }
   },
-  async join(req: Request, res: Response) {
+  async join(expressRequest: Request, res: Response) {
     try {
-      const { userId } = req.body;
+      const req = expressRequest as RequestCustom;
       const { id } = req.params;
-      if (!userId) throw new Error("UserId is required");
-      const user = await prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
-      });
+      if (!req.user.id) throw new Error("UserId is required");
+      const user = req.user;
       if (!user) throw new Error("User not found");
       if (!id) throw new Error("RoomId is required");
       const room = await prisma.room.findUnique({
@@ -145,11 +181,14 @@ export const RoomController = {
           id,
         },
       });
+
       if (!room) throw new Error("Room not found");
+      if (room.ownerId === user.id)
+        throw new Error("You can't join your own room");
       const roomUsers = await prisma.roomUser.findFirst({
         where: {
           roomId: id,
-          userId,
+          userId: req.user.id,
         },
       });
       if (roomUsers) {
