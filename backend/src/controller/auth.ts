@@ -5,13 +5,13 @@ import { encodeUserToken } from "../middlewares/acl";
 import { Request, Response } from "express";
 import { compare, hashSync } from "bcryptjs";
 import { getToken } from "../middlewares/deezer";
-import { KafkaConnection } from "../middlewares/kafka";
+// import { KafkaConnection } from "../middlewares/kafka";
 import { RequestCustom } from "../types/requestCustom";
 import { PrismaClient, User, SpotifyInfo, DeezerInfo } from "@prisma/client";
 dotenv.config();
 
 const prisma = new PrismaClient();
-const kafka = KafkaConnection.getInstance();
+// const kafka = KafkaConnection.getInstance();
 
 const findUser = async (email: string) => {
   const user = await prisma.user.findFirst({

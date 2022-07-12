@@ -147,13 +147,13 @@ export const RoomList = () => {
           }) => {
             const artists = room.tracks.map(
               (track: {
-                Track: { artist: { id: any; name: any; picture: any } };
+                track: { artist: { id: any; name: any; picture: any } };
               }) => {
                 return {
-                  id: track.Track.artist.id,
-                  name: track.Track.artist.name,
-                  image: track.Track.artist.picture
-                    ? track.Track.artist.picture
+                  id: track.track.artist.id,
+                  name: track.track.artist.name,
+                  image: track.track.artist.picture
+                    ? track.track.artist.picture
                     : "https://via.placeholder.com/150",
                 };
               }

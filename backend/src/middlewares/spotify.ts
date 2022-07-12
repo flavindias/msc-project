@@ -1,12 +1,11 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
-import db from "./mongo";
 dotenv.config();
 
 const prisma = new PrismaClient();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const saveNewTrack = async (spTrack: any) => {
-  console.log(spTrack, "spTrack");
   try {
     let artistId = "";
     const checkArtist = await prisma.spotifyArtist.findUnique({
@@ -25,6 +24,7 @@ const saveNewTrack = async (spTrack: any) => {
         const newArtist = await prisma.artist.create({
           data: {
             name: spTrack.artists[0].name,
+            picture: spTrack.artists[0].images[0].url,
             spotify: {
               create: {
                 spotifyId: spTrack.artists[0].id,
@@ -65,25 +65,6 @@ const saveNewTrack = async (spTrack: any) => {
       },
     });
     if (!track) {
-      console.log({
-        name: spTrack.name,
-        isrc: spTrack.external_ids.isrc,
-        spotify: {
-          create: {
-            spotifyId: spTrack.id,
-            uri: spTrack.uri,
-            href: spTrack.href,
-            previewUrl: spTrack.preview_url,
-            isLocal: spTrack.is_local,
-            popularity: spTrack.popularity,
-          },
-        },
-        artist: {
-          connect: {
-            id: artistId,
-          },
-        },
-      }, "spTrack");
       const newTrack = await prisma.track.create({
         data: {
           name: spTrack.name,
@@ -107,7 +88,7 @@ const saveNewTrack = async (spTrack: any) => {
       });
       return newTrack;
     }
-    if (!track.spotify) {
+    if (track && !track.spotify) {
       const newTrack = await prisma.track.update({
         where: {
           id: track.id,
@@ -129,6 +110,7 @@ const saveNewTrack = async (spTrack: any) => {
     }
     return track;
   } catch (err) {
+    return null
     console.log(err);
   }
 };
@@ -184,7 +166,7 @@ export const getTopTracks = async (token: string, userId: string) => {
   }
 };
 
-export const getTrackByISRC = async (isrc: string, token: string) => {
+const getTrackInfo = async (isrc: string, token: string) => {
   try {
     const response = await axios.get(
       `https://api.spotify.com/v1/search?type=track&q=isrc:${isrc}`,
@@ -194,21 +176,36 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
         },
       }
     );
-    const trackInfo = response.data.tracks.items[0];
-    if (trackInfo) {
-      const track = await prisma.track.findUnique({
-        where: {
-          isrc,
-        },
-        include: {
-          spotify: true,
-        },
-      });
-      if (!track) {
+    return response.data.tracks.items[0];
+  }
+  catch (error) {
+    console.log(error);
+  }
+};
+
+export const getTrackByISRC = async (isrc: string, token: string) => {
+  try {
+    const track = await prisma.track.findUnique({
+      where: {
+        isrc,
+      },
+      include: {
+        spotify: true,
+      },
+    });
+    if (!track) {
+      const trackInfo = await getTrackInfo(isrc, token);
+      if (trackInfo) {
         const newTrack = await saveNewTrack(trackInfo);
         return newTrack;
       }
-      if (track && !track.spotify) {
+      else{
+        throw new Error("Track not found");
+      }
+    }
+    else if (track && !track.spotify) {
+      const trackInfo = await getTrackInfo(isrc, token);
+      if (trackInfo) {
         await prisma.spotifyTrack.create({
           data: {
             trackId: track.id,
@@ -221,9 +218,16 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
           },
         });
       }
+      else{
+        throw new Error("Track not found");
+      }
+      
       return track;
     }
-    return null;
+    else{
+      return track;
+    }
+    
   } catch (error) {
     console.log(error);
   }

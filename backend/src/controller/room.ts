@@ -15,7 +15,7 @@ export const RoomController = {
         include: {
           tracks: {
             include: {
-              Track: {
+              track: {
                 include: {
                   artist: true,
                   contributors: true,
@@ -41,18 +41,24 @@ export const RoomController = {
           },
         },
       });
+      const roomUsers = await prisma.roomUser.findMany({
+        where: {
+          userId: req.user.id,
+        },
+        select:{
+          roomId: true,
+        }
+      });
       const roomsMember = await prisma.room.findMany({
         where: {
-          users: {
-            some: {
-              id: req.user.id,
-            },
+          id: {
+            in: roomUsers.map(roomUser => roomUser.roomId),
           },
         },
         include: {
           tracks: {
             include: {
-              Track: {
+              track: {
                 include: {
                   artist: true,
                   contributors: true,
@@ -79,6 +85,8 @@ export const RoomController = {
         },
       });
       const rooms = [...roomsOwner, ...roomsMember];
+      console.log(rooms, "rooms");
+      console.log(roomsMember, "roomsMember");
       res.json(rooms);
     } catch (err) {
       console.log(err);
@@ -140,10 +148,27 @@ export const RoomController = {
           id,
         },
         include: {
-          users: true,
+          owner: {
+            include: {
+              spotify: true,
+              deezer: true,
+            }
+          },
+          users: {
+            include: {
+              user: {
+                include: {
+                  votes: true,
+                  spotify: true,
+                  deezer: true,
+                }
+              }
+            }
+          },
+
           tracks: {
             include: {
-              Track: {
+              track: {
                 include: {
                   artist: true,
                   contributors: true,
@@ -192,7 +217,7 @@ export const RoomController = {
         },
       });
       if (roomUsers) {
-        res.status(200).json({
+        res.status(403).json({
           message: "User already in room",
         });
       } else {
@@ -202,6 +227,22 @@ export const RoomController = {
             userId: user.id,
           },
         });
+        if(room.deejai) {
+          const tracks = await prisma.userTracks.findMany({
+            where: {
+              userId: user.id,
+            },
+          });
+          const tracksToAdd = tracks.map((track) => {
+            return {
+              roomId: room.id,
+              trackId: track.trackId,
+            };
+          });
+          await prisma.roomTracks.createMany({
+            data: tracksToAdd,
+          });
+        }
         res.status(201).json({
           message: "User added to room",
           roomUser,

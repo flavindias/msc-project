@@ -34,9 +34,9 @@ const routes = {
 const WithNavLayout = () => {
   const authenticated = isAuthenticated();
   const [user, setUser] = useState({
-    name: "Pedro Dias",
-    player: "My Player Name",
-    photo: "https://randomuser.me/api/portraits/men/7.jpg",
+    name: "",
+    player: "",
+    photo: "",
   });
   useEffect(() => {
     async function fetchUser() {

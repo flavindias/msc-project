@@ -156,6 +156,7 @@ model UserTracks {
 model Room {
   id        String       @id @default(cuid())
   name      String
+  duration  Int          @default(60)
   owner     User         @relation("owner", fields: [ownerId], references: [id])
   ownerId   String
   users     RoomUser[]
@@ -171,7 +172,7 @@ model RoomTracks {
   id        String      @id @default(cuid())
   room      Room?       @relation(fields: [roomId], references: [id])
   roomId    String?
-  Track     Track?      @relation(fields: [trackId], references: [id])
+  track     Track?      @relation(fields: [trackId], references: [id])
   trackId   String?
   votes     RoomVotes[]
   createdAt DateTime    @default(now())

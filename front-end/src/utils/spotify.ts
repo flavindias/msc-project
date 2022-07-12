@@ -56,7 +56,6 @@ export const getTopTracks = async () => {
     const stored = JSON.parse(`${localStorage.getItem("spotifyToken")}`);
     const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
     if (!stored) throw new Error("No token stored");
-    console.log(stored.token, "stored");
     const response = await axios.get(
       `https://api.spotify.com/v1/me/top/tracks`,
       {
@@ -70,13 +69,11 @@ export const getTopTracks = async () => {
       }
     );
     const { items } = response.data;
-    console.log(items, items.length, typeof items, "items");
-    if(items.length === 0) throw new Error("No tracks found");
-    
+    if (items.length === 0) throw new Error("No tracks found");
+
     Promise.all(
-      items.map(async (item: { external_ids: { isrc: string; }; }) => {
-        console.log(item.external_ids.isrc);
-        const sync = await axios.post(
+      items.map(async (item: { external_ids: { isrc: string } }) => {
+        await axios.post(
           "http://localhost:3001/api/spotify/sync",
           {
             isrc: item.external_ids.isrc,
@@ -88,11 +85,8 @@ export const getTopTracks = async () => {
             },
           }
         );
-        console.log(sync);
       })
-    )
-    
-    
+    );
   } catch (err) {
     console.log(err);
   }

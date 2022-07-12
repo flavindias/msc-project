@@ -14,7 +14,6 @@ export const SpotifyController = {
       if (!user) throw new Error("User not found");
 
       const { isrc, token } = req.body;
-      //   const track = await getTrackByISRC(isrc, token);
       const searchTrack = await prisma.track.findUnique({
         where: {
           isrc,
