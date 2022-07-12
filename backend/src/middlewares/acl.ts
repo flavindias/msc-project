@@ -55,7 +55,6 @@ export const checkUser = () => {
   return async (expressRequest: Request, res: Response, next: NextFunction) => {
     try {
       const req = expressRequest as RequestCustom;
-      console.log(req.headers.authorization, "checkUser");
       if (!req.headers.authorization) throw new Error("No token provided");
       const userId = decodeUserToken(req.headers.authorization);
       if (!userId) throw new Error("Permission Denied - No Token");

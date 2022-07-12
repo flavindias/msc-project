@@ -50,7 +50,6 @@ export const AuthController = {
           deezer: true,
         },
       });
-      if (!user) throw new Error("User not found");
 
       let userResponse: User;
       const spotify = {
@@ -78,7 +77,7 @@ export const AuthController = {
       } else {
         userResponse = user;
       }
-      if (!user.spotify) {
+      if (user && !user.spotify) {
         userResponse = await prisma.user.update({
           where: {
             email: user.email,

@@ -3,6 +3,7 @@ import { checkUser, checkAdmin } from '../middlewares/acl';
 import { AuthController } from '../controller/auth';
 import { RoomController } from '../controller/room';
 import { DeezerController } from '../controller/deezer';
+import { SpotifyController } from '../controller/spotify';
 const router = Router();
 
 export const deejaiRoutes = () => {
@@ -16,5 +17,6 @@ export const deejaiRoutes = () => {
     router.post('/rooms', checkUser(), RoomController.create);
     router.post('/rooms/:id/join', RoomController.join);
     router.get('/deezer/recommendation', checkUser(), DeezerController.getRecommendation);
+    router.post('/spotify/sync', checkUser(), SpotifyController.syncTrack);
     return router;
 };
