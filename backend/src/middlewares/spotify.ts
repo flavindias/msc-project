@@ -8,52 +8,59 @@ const prisma = new PrismaClient();
 const saveNewTrack = async (spTrack: any) => {
   try {
     let artistId = "";
-    const checkArtist = await prisma.spotifyArtist.findUnique({
-      where: {
-        spotifyId: spTrack.artists[0].id,
-      },
-    });
-    if (checkArtist) artistId = checkArtist.artistId;
-    if (!checkArtist) {
-      const checkArtistByName = await prisma.artist.findFirst({
+    const { artists }  = spTrack;
+    if(artists && artists.length > 0){
+      const artist = artists[0];
+      const { id, images, name, uri, href, external_urls } = artist;
+      const checkArtist = await prisma.spotifyArtist.findUnique({
         where: {
-          name: spTrack.artists[0].name,
+          spotifyId: id,
         },
       });
-      if (!checkArtistByName) {
-        const newArtist = await prisma.artist.create({
-          data: {
-            name: spTrack.artists[0].name,
-            picture: spTrack.artists[0].images[0].url,
-            spotify: {
-              create: {
-                spotifyId: spTrack.artists[0].id,
-                uri: spTrack.artists[0].uri,
-                href: spTrack.artists[0].href,
-                url: spTrack.artists[0].external_urls.spotify,
-              },
-            },
-          },
-        });
-        artistId = newArtist.id;
-      } else {
-        const newArtist = await prisma.artist.update({
+      if (checkArtist) artistId = checkArtist.artistId;
+      if (!checkArtist) {
+        const checkArtistByName = await prisma.artist.findFirst({
           where: {
-            id: checkArtistByName.id,
-          },
-          data: {
-            spotify: {
-              create: {
-                spotifyId: spTrack.artists[0].id,
-                uri: spTrack.artists[0].uri,
-                href: spTrack.artists[0].href,
-                url: spTrack.artists[0].external_urls.spotify,
-              },
-            },
+            name,
           },
         });
-        artistId = newArtist.id;
-      }
+        const picture = images && images.length > 0 ? images[0].url : "";
+        if (!checkArtistByName) {
+          const newArtist = await prisma.artist.create({
+            data: {
+              name,
+              picture,
+              spotify: {
+                create: {
+                  spotifyId: id,
+                  uri: uri,
+                  href: href,
+                  url: external_urls.spotify,
+                },
+              },
+            },
+          });
+          artistId = newArtist.id;
+        } else {
+          const newArtist = await prisma.artist.update({
+            where: {
+              id: checkArtistByName.id,
+            },
+            data: {
+              spotify: {
+                create: {
+                  spotifyId: id,
+                  uri: uri,
+                  href: href,
+                  url: external_urls.spotify,
+                },
+              },
+            },
+          });
+          artistId = newArtist.id;
+        }
+    }
+    
     }
     const track = await prisma.track.findUnique({
       where: {
@@ -167,7 +174,7 @@ export const getTopTracks = async (token: string, userId: string) => {
 
 const getTrackInfo = async (isrc: string, token: string) => {
   try {
-    const response = await axios.get(
+    const  {data } = await axios.get(
       `https://api.spotify.com/v1/search?type=track&q=isrc:${isrc}`,
       {
         headers: {
@@ -179,7 +186,11 @@ const getTrackInfo = async (isrc: string, token: string) => {
         }
       }
     );
-    return response.data.tracks.items[0];
+    if(data.tracks && data.tracks.items && data.tracks.items.length > 0){
+      return data.tracks.items[0];
+    }
+    
+    return null;
   }
   catch (error) {
     console.error(error);

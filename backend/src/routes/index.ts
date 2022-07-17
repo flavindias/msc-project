@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { checkUser, checkAdmin } from '../middlewares/acl';
 import { AuthController } from '../controller/auth';
 import { RoomController } from '../controller/room';
+import { TrackController } from '../controller/track';
 import { DeezerController } from '../controller/deezer';
 import { SpotifyController } from '../controller/spotify';
 const router = Router();
@@ -19,5 +20,7 @@ export const deejaiRoutes = () => {
     router.get('/deezer/recommendation', checkUser(), DeezerController.getRecommendation);
     router.post('/deezer/isrc/:isrc', checkUser(), DeezerController.getSongInfoISRC);
     router.post('/spotify/sync', checkUser(), SpotifyController.syncTrack);
+    router.get('/tracks', checkUser(), TrackController.list);
+    router.post('/tracks/:trackId/vote', checkUser(), TrackController.vote);
     return router;
 };

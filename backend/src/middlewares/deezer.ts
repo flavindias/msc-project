@@ -103,6 +103,7 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
             id: checkArtistByName.id,
           },
           data: {
+            picture: response.data.artist.picture_xl,
             deezer: {
               create: {
                 deezerId: response.data.artist.id,

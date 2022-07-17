@@ -149,7 +149,15 @@ export const AuthController = {
       } else {
         userResponse = user;
       }
-      if (!user.deezer) {
+      const deezerInfo = await prisma.user.findFirst({
+        where: {
+          deezer: {
+            id: `${response.data.id}`,
+          } 
+        }
+
+      })
+      if (!deezerInfo) {
         userResponse = await prisma.user.update({
           where: {
             email: user.email,

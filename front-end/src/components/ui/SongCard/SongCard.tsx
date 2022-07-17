@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
+import { voteSong } from "../../../utils/deejai";
 
 const CardBg = styled.div`
   width: 20%;
@@ -16,6 +17,7 @@ const CardBg = styled.div`
   margin-bottom: 1rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  max-height: 150px;
   &:hover {
     box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.1),
       0px 2px 6px rgba(0, 0, 0, 0.08), 0px 0px 1px rgba(0, 0, 0, 0.08);
@@ -37,20 +39,46 @@ const Title = styled.h1`
   font-weight: 600;
   color: #404040;
   vertical-align: middle;
+  height: 55px;
+  line-height: 100%;
+  font-size: inherit;
 `;
 const ShareArea = styled.div`
+  /* display: {
+    ${(props: { show: boolean }) => (props.show ? "none" : "flex")}
+  } */
+  width: 30%;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: space-between;
   vertical-align: middle;
+  height: 55px;
+  align-items: flex-start;
+  min-width: 55px;
 `;
-const ReactionIcon = styled.i`
-  color: #42abc3;
-  margin-left: 5px;
+const DislikeIcon = styled.i`
+  color: ${(props: { status: string }) =>
+    props.status === "DISLIKE" ? "#f44336" : "#dadada"};
+    &:hover {
+      color: #fa6359c5;
+    }
+`;
+const NewIcon = styled.i`
+  color: ${(props: { status: string }) =>
+    props.status === "NEUTRAL" ? "#FFD700" : "#dadada"};
+    &:hover {
+      color: #ebdfa0;
+    }
+`;
+const LikeIcon = styled.i`
+  color: ${(props: { status: string }) =>
+    props.status === "LIKE" ? "#42abc3" : "#dadada"};
+    &:hover {
+      color: #94d4d4;
+    }
 `;
 const ISRC = styled.span`
-  font-size: 0.75rem;
+  font-size: x-small;
   font-weight: 300;
   color: #aeaeae;
 `;
@@ -76,7 +104,7 @@ const ArtistImage = styled.img`
   margin-bottom: 0.5rem;
 `;
 const ArtistName = styled.span`
-  font-size: 1rem;
+  font-size: unset;
   font-weight: 300;
   color: #404040;
 `;
@@ -95,10 +123,19 @@ const SpotifyIcon = styled.i`
 
 const DeezerIcon = styled.i`
   color: ${(props: { deezerPreviewURL: string }) =>
-    props.deezerPreviewURL !== "" ? "#00c7f2" : "#aeaeae"};
+    props.deezerPreviewURL !== "" ? "#ef5466" : "#aeaeae"};
   margin-left: 5px;
 `;
 
+const PlayIcon = styled.i`
+  color: #42abc3;
+  margin-left: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    color: #1db954;
+  }
+`;
 export const SongCard = (props: {
   isrc: string;
   id: string;
@@ -111,9 +148,11 @@ export const SongCard = (props: {
     name: string;
     image: string;
   }[];
+  deejai: boolean;
+  voting: () => void;
 }) => {
   const [playing, setPlaying] = useState(false);
-  
+
   const audio = new Audio(
     props.deezerPreviewURL
       ? props.deezerPreviewURL
@@ -122,6 +161,17 @@ export const SongCard = (props: {
       : ""
   );
   const audioRef = useRef(audio);
+
+  const like = async () => {
+    pause();
+    await voteSong(props.id, "LIKE");
+    props.voting();
+  };
+  const dislike = async () => {
+    pause();
+    await voteSong(props.id, "DISLIKE");
+    props.voting();
+  };
 
   const play = () => {
     setPlaying(true);
@@ -136,35 +186,37 @@ export const SongCard = (props: {
     <CardBg>
       <TitleRow>
         <Title>{props.name}</Title>
-        <ShareArea>
-          <ReactionIcon
-            className={
-              props.status === "liked"
-                ? "fas fa-thumbs-up"
-                : props.status === "disliked"
-                ? "fas fa-thumbs-down"
-                : "fa-solid fa-certificate"
-            }
-            style={
-              props.status === "liked"
-                ? { color: "#42abc3" }
-                : props.status === "disliked"
-                ? { color: "#f44336" }
-                : { color: "#FFD700" }
-            }
+        <ShareArea show={props.deejai}>
+          <LikeIcon
+            onClick={() => like()}
+            status={props.status}
+            className={"fas fa-thumbs-up"}
+          />
+          <NewIcon
+            status={props.status}
+            className={"fa-solid fa-certificate"}
+          />
+          <DislikeIcon
+            onClick={() => dislike()}
+            status={props.status}
+            className={"fas fa-thumbs-down"}
           />
         </ShareArea>
       </TitleRow>
       <ArtistsRow>
         {props.artists.map((artist, index) => (
           <ArtistElement key={index}>
-            <ArtistImage src={artist.image} />
+            {/* <ArtistImage src={artist.image} /> */}
             <ArtistName>{artist.name}</ArtistName>
           </ArtistElement>
         ))}
       </ArtistsRow>
       <CardFooter>
         <ISRC>{`${props.isrc}`}</ISRC>
+        <PlayIcon
+          className={playing ? "fa-solid fa-pause" : "fas fa-play"}
+          onClick={() => (playing ? pause() : play())}
+        />
         <SpotifyIcon
           spotifyPreviewURL={props.spotifyPreviewURL}
           onClick={() => (playing ? pause() : play())}

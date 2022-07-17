@@ -13,6 +13,7 @@ import { HomePage } from "./pages/home/home";
 import { NavBar } from "./components/ui/NavBar/NavBar";
 import { RoomList } from "./pages/rooms/list";
 import { RoomView } from "./pages/rooms/view";
+import { SongList } from "./pages/songs/list";
 import { isAuthenticated, getUser } from "./utils/auth";
 
 const AppContainer = styled.div`
@@ -27,6 +28,7 @@ const routes = {
   login: "/login",
   rooms: "/rooms",
   room: "/rooms/:id",
+  songs: "/songs",
 };
 
 
@@ -69,6 +71,7 @@ root.render(
       <Route element={<WithNavLayout />}>
         <Route path={routes.rooms} element={<RoomList />} />
         <Route path={routes.room} element={<RoomView />} />
+        <Route path={routes.songs} element={<SongList />} />
       </Route>
     </Routes>
   </BrowserRouter>

@@ -2,6 +2,7 @@ import axios from "axios";
 import { addHours } from "date-fns";
 import { NavigateFunction } from "react-router-dom";
 
+const getLocalToken = () => JSON.parse(`${localStorage.getItem("spotifyToken")}`);
 export const getSpotifyToken = async (
   token: string,
   navigate: NavigateFunction
@@ -53,8 +54,7 @@ export const getSpotifyToken = async (
 
 export const getTopTracks = async () => {
   try {
-    const stored = JSON.parse(`${localStorage.getItem("spotifyToken")}`);
-    const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
+    const stored = getLocalToken();
     if (!stored) throw new Error("No token stored");
     const response = await axios.get(
       `https://api.spotify.com/v1/me/top/tracks`,
@@ -73,21 +73,37 @@ export const getTopTracks = async () => {
 
     Promise.all(
       items.map(async (item: { external_ids: { isrc: string } }) => {
-        await axios.post(
-          "http://localhost:3001/api/spotify/sync",
-          {
-            isrc: item.external_ids.isrc,
-            token: stored.token,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${authenticated.token}`,
-            },
-          }
-        );
+        await getTrackInfoByISRC(item.external_ids.isrc);
       })
     );
   } catch (err) {
     console.log(err);
   }
 };
+
+export const getTrackInfoByISRC = async (isrc: string) => {
+  try {
+    const stored = getLocalToken();
+    if (!stored) throw new Error("No token stored");
+    const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
+    if(!authenticated) throw new Error("No deejai token stored");
+    console.log({
+      isrc,
+      token: stored.token,
+    })
+    await axios.post(
+      "http://localhost:3001/api/spotify/sync",
+      {
+        isrc,
+        token: stored.token,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authenticated.token}`,
+        },
+      }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+}

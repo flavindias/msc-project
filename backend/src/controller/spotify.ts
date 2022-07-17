@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { RequestCustom } from "../types/requestCustom";
@@ -17,6 +16,9 @@ export const SpotifyController = {
       const searchTrack = await prisma.track.findUnique({
         where: {
           isrc,
+        },
+        include: {
+          spotify: true,
         },
       });
       if (!searchTrack) {
@@ -42,6 +44,14 @@ export const SpotifyController = {
           });
         }
       } else {
+        if(!searchTrack.spotify) {
+          const track = await getTrackByISRC(isrc, token);
+          if (!track) {
+            throw new Error("Track not found", {
+              cause: req.body,
+            });
+          }
+        }
         const userTrack = await prisma.userTracks.findFirst({
           where: {
             userId: user.id,
