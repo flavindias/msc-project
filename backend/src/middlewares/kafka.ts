@@ -101,7 +101,6 @@ export class KafkaConnection {
       //         break;
       //       case "spotify-login":
       //         const msg2 = message.value && JSON.parse(message.value.toString());
-      //         console.log(msg2, "msg2");
       //         await getTopTracks(msg2.token, msg2.userId);
       //         break;
       //       default:

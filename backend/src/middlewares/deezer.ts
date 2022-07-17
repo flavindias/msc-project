@@ -42,22 +42,20 @@ export const getToken = async (code: string) => {
     );
     return response.data.access_token;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
 export const getTracks = async (token: string) => {
   try {
-    console.log(token, "token");
     const response = await axios.get("https://api.deezer.com/user/me/tracks", {
       params: {
         access_token: token,
       },
     });
-    console.log(response.data, "getTracks");
     return response.data.data;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
@@ -83,7 +81,6 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
         },
       });
       if (!checkArtistByName) {
-        console.log( response.data.artist, "artist");
         const newArtist = await prisma.artist.create({
           data: {
             name: response.data.artist.name,
@@ -185,7 +182,7 @@ export const getTrackInfo = async (id: string, accessToken: string) => {
     }
     return track;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return error;
   }
 };
@@ -200,9 +197,10 @@ export const getTrackByISRC = async (token: string, isrc: string) => {
         },
       }
     );
+    await getTrackInfo(response.data.id, token);
     return response.data;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
@@ -259,7 +257,7 @@ export const getRecommendation = async (accessToken: string, userId: string) => 
       })
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
@@ -285,7 +283,7 @@ export const run = async () => {
     //   }
     // }, 30000);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 

@@ -110,8 +110,8 @@ const saveNewTrack = async (spTrack: any) => {
     }
     return track;
   } catch (err) {
+    console.error(err);
     return null
-    console.log(err);
   }
 };
 
@@ -158,11 +158,10 @@ export const getTopTracks = async (token: string, userId: string) => {
             });
           }
         }
-        console.log(track, "topTracks");
       })
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -174,12 +173,16 @@ const getTrackInfo = async (isrc: string, token: string) => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params:{
+          limit: 1,
+          offset: 0,
+        }
       }
     );
     return response.data.tracks.items[0];
   }
   catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -229,7 +232,7 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
     }
     
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 const CardBg = styled.div`
@@ -20,7 +20,7 @@ const CardBg = styled.div`
     box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.1),
       0px 2px 6px rgba(0, 0, 0, 0.08), 0px 0px 1px rgba(0, 0, 0, 0.08);
   }
-  @media  (max-width: 768px) {
+  @media (max-width: 768px) {
     width: 100%;
     height: 100%;
   }
@@ -87,18 +87,51 @@ const CardFooter = styled.div`
   justify-content: space-between;
   margin-bottom: 1rem;
 `;
+const SpotifyIcon = styled.i`
+  color: ${(props: { spotifyPreviewURL: string }) =>
+    props.spotifyPreviewURL !== "" ? "#1db954" : "#aeaeae"};
+  margin-left: 5px;
+`;
+
+const DeezerIcon = styled.i`
+  color: ${(props: { deezerPreviewURL: string }) =>
+    props.deezerPreviewURL !== "" ? "#00c7f2" : "#aeaeae"};
+  margin-left: 5px;
+`;
 
 export const SongCard = (props: {
   isrc: string;
   id: string;
   name: string;
   status: string;
+  deezerPreviewURL: string;
+  spotifyPreviewURL: string;
   artists: {
     id: string;
     name: string;
     image: string;
   }[];
 }) => {
+  const [playing, setPlaying] = useState(false);
+  
+  const audio = new Audio(
+    props.deezerPreviewURL
+      ? props.deezerPreviewURL
+      : props.spotifyPreviewURL
+      ? props.spotifyPreviewURL
+      : ""
+  );
+  const audioRef = useRef(audio);
+
+  const play = () => {
+    setPlaying(true);
+    audioRef.current.play();
+  };
+
+  const pause = () => {
+    setPlaying(false);
+    audioRef.current.pause();
+  };
   return (
     <CardBg>
       <TitleRow>
@@ -106,12 +139,18 @@ export const SongCard = (props: {
         <ShareArea>
           <ReactionIcon
             className={
-              props.status === "liked" ? "fas fa-thumbs-up" :(props.status === "disliked" ? "fas fa-thumbs-down" : "fa-solid fa-certificate")
+              props.status === "liked"
+                ? "fas fa-thumbs-up"
+                : props.status === "disliked"
+                ? "fas fa-thumbs-down"
+                : "fa-solid fa-certificate"
             }
             style={
-                props.status === "liked"
-                    ? { color: "#42abc3" }
-                    : (props.status === "disliked" ? { color: "#f44336" } : { color: "#FFD700" })
+              props.status === "liked"
+                ? { color: "#42abc3" }
+                : props.status === "disliked"
+                ? { color: "#f44336" }
+                : { color: "#FFD700" }
             }
           />
         </ShareArea>
@@ -126,6 +165,18 @@ export const SongCard = (props: {
       </ArtistsRow>
       <CardFooter>
         <ISRC>{`${props.isrc}`}</ISRC>
+        <SpotifyIcon
+          spotifyPreviewURL={props.spotifyPreviewURL}
+          onClick={() => (playing ? pause() : play())}
+          className={"fa-brands fa-spotify"}
+        />
+        <DeezerIcon
+          deezerPreviewURL={props.deezerPreviewURL}
+          onClick={() => {
+            playing ? pause() : play();
+          }}
+          className={"fa-brands fa-deezer"}
+        />
       </CardFooter>
     </CardBg>
   );

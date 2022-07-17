@@ -34,5 +34,5 @@ kafka.run();
 SpotifyWatcher();
 DeezerWatcher();
 app.listen(API_PORT, () => {
-  console.log(`API listening on port ${API_PORT}`);
+  console.info(`API listening on port ${API_PORT}`);
 });

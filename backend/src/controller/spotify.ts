@@ -19,37 +19,36 @@ export const SpotifyController = {
           isrc,
         },
       });
-      console.log(searchTrack, "searchTrack");
-      if(!searchTrack) {
+      if (!searchTrack) {
         const track = await getTrackByISRC(isrc, token);
         if (track) {
-            await prisma.userTracks.create({
-                data: {
-                  user: {
-                    connect: {
-                      id: user.id,
-                    },
-                  },
-                  track: {
-                    connect: {
-                      id: track.id,
-                    },
-                  },
+          await prisma.userTracks.create({
+            data: {
+              user: {
+                connect: {
+                  id: user.id,
                 },
-              });
+              },
+              track: {
+                connect: {
+                  id: track.id,
+                },
+              },
+            },
+          });
+        } else {
+          throw new Error("Track not found", {
+            cause: req.body,
+          });
         }
-        else{
-          throw new Error("Track not found");
-        }
-      }
-      else{
+      } else {
         const userTrack = await prisma.userTracks.findFirst({
           where: {
             userId: user.id,
             trackId: searchTrack.id,
           },
         });
-        if(!userTrack) {
+        if (!userTrack) {
           await prisma.userTracks.create({
             data: {
               userId: user.id,
@@ -58,12 +57,12 @@ export const SpotifyController = {
           });
         }
       }
-      
+
       return res.status(200).json({
         message: "Successfully synced track",
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({
         message: "Error syncing track",
         error: err,

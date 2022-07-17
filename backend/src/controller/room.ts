@@ -57,8 +57,10 @@ export const RoomController = {
         },
         include: {
           tracks: {
+
             include: {
               track: {
+                
                 include: {
                   artist: true,
                   contributors: true,
@@ -85,11 +87,9 @@ export const RoomController = {
         },
       });
       const rooms = [...roomsOwner, ...roomsMember];
-      console.log(rooms, "rooms");
-      console.log(roomsMember, "roomsMember");
       res.json(rooms);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({
         message: err,
       });
@@ -172,6 +172,8 @@ export const RoomController = {
                 include: {
                   artist: true,
                   contributors: true,
+                  deezer: true,
+                  spotify: true,
                 },
               },
             },

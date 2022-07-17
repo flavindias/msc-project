@@ -32,6 +32,8 @@ const song = {
 
 export const navbar: ComponentStory<typeof SongCard> = () => (
   <SongCard
+    deezerPreviewURL="https://cdns-preview-5.dzcdn.net/stream/c-5ac995d4ffd81eccda77f35db0fc2fb4-5.mp3"
+    spotifyPreviewURL="https://cdns-preview-5.dzcdn.net/stream/c-5ac995d4ffd81eccda77f35db0fc2fb4-5.mp3"
     name={song.name}
     artists={artists}
     isrc={song.isrc}

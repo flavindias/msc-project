@@ -3,6 +3,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { getDeejaiToken } from "../../utils/auth";
+import { getTrackInfoByISRC } from "../../utils/deezer";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
 
 const Container = styled.div`
@@ -133,9 +134,13 @@ export interface IArtistResult {
   picture: string;
   name: string;
 }
+
 export const RoomView = () => {
+  const platform = localStorage.getItem("platform");
   const { id } = useParams();
   const [tracks, setTracks] = useState([]);
+  const [onlyDeezer, setOnlyDeezer] = useState<string[]>([]);
+  const [onlySpotify, setOnlySpotify] = useState<string[]>([]);
   const [users, setUsers] = useState<IUserResult[] | undefined>([]);
   const [owner, setOwner] = useState<IUserResult | undefined>(undefined);
   const [artists, setArtist] = useState<IArtistResult[] | undefined>(undefined);
@@ -145,6 +150,12 @@ export const RoomView = () => {
     isPrivate: false,
     deejai: false,
   });
+
+  const findTrackInfo = async (isrc: string) => {
+    const trackInfo = await getTrackInfoByISRC(isrc);
+    return trackInfo;
+  }
+  
   const fetchData = async () => {
     const response = await axios.get(`http://localhost:3001/api/rooms/${id}`, {
       headers: {
@@ -152,7 +163,22 @@ export const RoomView = () => {
       },
     });
     const { room } = response.data;
-    setTracks(room.tracks.map((trackInfo: { track: any }) => trackInfo.track));
+    setTracks(
+      room.tracks.map(
+        (trackInfo: {
+          track: { deezer: any | null; isrc: string; spotify: any | null };
+        }) => {
+          if (!trackInfo.track.deezer) {
+            setOnlySpotify([...onlySpotify, trackInfo.track.isrc]);
+          }
+          if (!trackInfo.track.spotify) {
+            setOnlyDeezer([...onlyDeezer, trackInfo.track.isrc]);
+          }
+
+          return { ...trackInfo.track };
+        }
+      )
+    );
     setUsers(room.users.map((userInfo: { user: any }) => userInfo.user));
     setOwner(room.owner);
     setRoom(room);
@@ -171,8 +197,14 @@ export const RoomView = () => {
     }
     fetchRoom();
   }, []);
-  console.log(artists, "artists");
-  console.log(owner, "owner");
+  console.log(onlyDeezer, "onlyDeezer");
+  console.log(onlySpotify, "onlySpotify");
+  Promise.all(
+    onlySpotify.map(async (isrc: string) => {
+      await findTrackInfo(isrc);
+    })
+  );
+
   return (
     <Container>
       <TitleContainer>
@@ -228,17 +260,31 @@ export const RoomView = () => {
         <SectionTitleText>Songs</SectionTitleText>
         <RoomViewContainer>
           <SongContainer>
-            {tracks.map((song: { id: string; name: string; isrc: string }) => {
-              return (
-                <SongCard
-                  name={song.name}
-                  artists={[]}
-                  isrc={song.isrc}
-                  status={"liked"}
-                  id={song.id}
-                />
-              );
-            })}
+            {tracks.map(
+              (song: {
+                id: string;
+                name: string;
+                isrc: string;
+                previewURL: string;
+                deezer: { preview: string } | null;
+                spotify: { previewUrl: string } | null;
+              }) => {
+                return (
+                  <SongCard
+                    key={song.id}
+                    deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
+                    spotifyPreviewURL={
+                      song.spotify ? song.spotify.previewUrl : ""
+                    }
+                    name={song.name}
+                    artists={[]}
+                    isrc={`${song.isrc}`}
+                    status={"liked"}
+                    id={song.id}
+                  />
+                );
+              }
+            )}
           </SongContainer>
         </RoomViewContainer>
       </Content>

@@ -104,7 +104,7 @@ export const AuthController = {
           deejaiToken: encodeUserToken(userResponse.id),
         });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({
         message: "Error while trying to authenticate with Spotify",
       });
@@ -132,7 +132,6 @@ export const AuthController = {
         link: response.data.link,
         picture: response.data.picture_medium,
       };
-      console.log(deezer)
       if (!user) {
         userResponse = await prisma.user.create({
           data: {
@@ -150,7 +149,6 @@ export const AuthController = {
       } else {
         userResponse = user;
       }
-      console.log(userResponse)
       if (!user.deezer) {
         userResponse = await prisma.user.update({
           where: {
@@ -176,7 +174,7 @@ export const AuthController = {
         deejaiToken: encodeUserToken(userResponse.id),
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({
         message: "Error while trying to authenticate with Deezer",
       });
