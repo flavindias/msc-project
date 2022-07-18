@@ -71,12 +71,15 @@ export const NavBar = (props: {
     player: string;
     photo: string;
   } | null;
+  goHome: () => void;
 }) => {
-  
+  const goHome = () => {
+    props.goHome();
+  }
   return (
     <NavContainer>
       <LogoContainer>
-        <LogoImage src={props.logo} alt="logo" />
+        <LogoImage onClick={() => goHome()} src={props.logo} alt="logo" />
       </LogoContainer>
       {props.user && (
         <UserContainer onClick={() => logout()}>
@@ -90,3 +93,5 @@ export const NavBar = (props: {
     </NavContainer>
   );
 };
+
+

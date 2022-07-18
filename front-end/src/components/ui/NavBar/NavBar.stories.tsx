@@ -17,5 +17,5 @@ const user = {
 	photo: 'https://randomuser.me/api/portraits/men/7.jpg',
 };
 export const navbar: ComponentStory<typeof NavBar> = () => (
-	<NavBar logo={'https://i.ibb.co/7WyPN8Q/deejai-logo.png'} user={user}/>
+	<NavBar goHome={() => {}}logo={'https://i.ibb.co/7WyPN8Q/deejai-logo.png'} user={user}/>
 );

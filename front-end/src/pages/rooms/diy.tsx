@@ -168,14 +168,14 @@ export const RoomView = () => {
         return { ...trackInfo.track };
       }
     );
-    const onlyDeezerTracks = fetchedTracks.filter(
-      (track: { spotify: any }) => {
+    const onlyDeezerTracks = fetchedTracks
+      .filter((track: { spotify: any }) => {
         return !track.spotify;
-      }
-    ).map((track: { isrc: string }) => track.isrc);
-    const onlySpotifyTracks = fetchedTracks.filter(
-      ( track: { deezer: any | null } ) => !track.deezer
-    ).map((track: { isrc: string }) => track.isrc);
+      })
+      .map((track: { isrc: string }) => track.isrc);
+    const onlySpotifyTracks = fetchedTracks
+      .filter((track: { deezer: any | null }) => !track.deezer)
+      .map((track: { isrc: string }) => track.isrc);
     const fetchedArtists = room.tracks
       .map((trackInfo: { track: any }) => trackInfo.track.artist)
       .filter(
@@ -268,26 +268,34 @@ export const RoomView = () => {
           <SongContainer>
             {tracks.map(
               (song: {
-                artist: { id: string; name: string; picture: string; };
+                artist: { id: string; name: string; picture: string };
                 id: string;
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string } | null;
-                spotify: { previewUrl: string } | null;
+                deezer: { preview: string; link: string } | null;
+                spotify: { previewUrl: string; uri: string } | null;
               }) => {
                 console.log(song);
                 return (
                   <SongCard
-                    voting={()=>{}}
+                    voting={() => {}}
                     deejai={room.deejai}
+                    deezerLink="https://www.deejai.com/track/5e8f8f8f-f8f8-f8f8-f8f8-f8f8f8f8f8f8f"
+                    spotifyLink="https://open.spotify.com/track/5e8f8f8f-f8f8-f8f8-f8f8-f8f8f8f8f8f8f"
                     key={song.isrc}
                     deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
                     spotifyPreviewURL={
                       song.spotify ? song.spotify.previewUrl : ""
                     }
                     name={song.name}
-                    artists={[{id: song.artist.id, name: song.artist.name, image: song.artist.picture}]}
+                    artists={[
+                      {
+                        id: song.artist.id,
+                        name: song.artist.name,
+                        image: song.artist.picture,
+                      },
+                    ]}
                     isrc={`${song.isrc}`}
                     status={"liked"}
                     id={song.id}

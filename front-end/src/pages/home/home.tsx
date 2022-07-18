@@ -79,7 +79,7 @@ export const HomePage = () => {
 
   return (
     <Container>
-      <NavBar logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"} user={null} />
+      <NavBar goHome={() => {}} logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"} user={null} />
       <Content>
         <Caption>
           <Title>Simplifying your party</Title>

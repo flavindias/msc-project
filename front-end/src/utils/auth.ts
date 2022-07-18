@@ -36,7 +36,7 @@ export const getUser = async () => {
 	  const { user } = data;
 	  const userData = {
 		name: user.name,
-		player: getPlatform().name,
+		player: `${getPlatform().name} - logout`,
 		photo: user.spotify
 		  ? user.spotify.picture
 		  : user.deezer

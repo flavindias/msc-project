@@ -34,6 +34,8 @@ export const navbar: ComponentStory<typeof VoteCard> = () => (
   <VoteCard
     voting={() => {}}
     deejai={true}
+    deezerLink="https://www.deejai.com/track/5e8f8f8f-f8f8-f8f8-f8f8-f8f8f8f8f8f8f"
+    spotifyLink="https://open.spotify.com/track/5e8f8f8f-f8f8-f8f8-f8f8-f8f8f8f8f8f8f"
     deezerPreviewURL="https://cdns-preview-5.dzcdn.net/stream/c-5ac995d4ffd81eccda77f35db0fc2fb4-5.mp3"
     spotifyPreviewURL="https://cdns-preview-5.dzcdn.net/stream/c-5ac995d4ffd81eccda77f35db0fc2fb4-5.mp3"
     name={song.name}

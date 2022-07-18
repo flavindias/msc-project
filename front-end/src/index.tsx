@@ -7,6 +7,7 @@ import {
   Route,
   Navigate,
   Outlet,
+  useNavigate,
 } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 import { HomePage } from "./pages/home/home";
@@ -24,6 +25,7 @@ const AppContainer = styled.div`
 `;
 
 const routes = {
+  home: "/",
   dashboard: "/dashboard",
   login: "/login",
   rooms: "/rooms",
@@ -34,12 +36,16 @@ const routes = {
 
 
 const WithNavLayout = () => {
+  const navigate = useNavigate();
   const authenticated = isAuthenticated();
   const [user, setUser] = useState({
     name: "",
     player: "",
     photo: "",
   });
+  const goToHome = () => {
+    navigate("/rooms");
+  }
   useEffect(() => {
     async function fetchUser() {
       const user = await getUser();
@@ -53,11 +59,12 @@ const WithNavLayout = () => {
   } else {
     return (
       <AppContainer>
-        <NavBar logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"} user={user} />
+        <NavBar goHome={() => goToHome()} logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"} user={user} />
         <Outlet />
       </AppContainer>
     );
   }
+  
 };
 
 const root = ReactDOM.createRoot(

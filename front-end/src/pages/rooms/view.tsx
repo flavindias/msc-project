@@ -181,9 +181,11 @@ export interface ITrackResult {
   artist: IArtistResult;
   deezer: {
     preview: string;
+    link: string;
   };
   spotify: {
     previewUrl: string;
+    uri: string;
   };
   isrc: string;
 }
@@ -279,7 +281,7 @@ export const RoomView = () => {
   }, [vote]);
 
   const voting = async (trackId: string) => {
-    await addToPlaylist(`${room.id}`, trackId)
+    await addToPlaylist(`${room.id}`, trackId);
     setVote(true);
   };
   if (platform.name === "deezer") {
@@ -359,6 +361,8 @@ export const RoomView = () => {
                     <VoteCard
                       voting={() => voting(song.id)}
                       deejai={true}
+                      deezerLink={song.deezer ? song.deezer.link : ""}
+                      spotifyLink={song.spotify ? song.spotify.uri : ""}
                       deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
                       spotifyPreviewURL={
                         song.spotify ? song.spotify.previewUrl : ""
@@ -409,8 +413,8 @@ export const RoomView = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string } | null;
-                spotify: { previewUrl: string } | null;
+                deezer: { preview: string, link: string } | null;
+                spotify: { previewUrl: string, uri: string } | null;
               }) => {
                 console.log(song);
                 return (
@@ -418,6 +422,8 @@ export const RoomView = () => {
                     voting={() => {}}
                     deejai={room.deejai}
                     key={song.isrc}
+                    deezerLink={song.deezer ? song.deezer.link : ""}
+                    spotifyLink={song.spotify ? song.spotify.uri : ""}
                     deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
                     spotifyPreviewURL={
                       song.spotify ? song.spotify.previewUrl : ""

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { getSongs } from "../../utils/deejai";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
+import { getRecommendations } from "../../utils/deezer";
+import { getTopTracks } from "../../utils/spotify";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -62,6 +64,42 @@ const SongContainer = styled.div`
     width: 100%;
   }
 `;
+const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+`;
+const SyncIcon = styled.i`
+  font-size: 1.5rem;
+  color: #70a9c7;
+  margin-right: 1rem;
+`;
+
+const SyncButton = styled.div`
+  background: #ffffff;
+  border: 1px solid #70a9c7;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #70a9c7;
+  margin-right: 1rem;
+  cursor: pointer;
+  &:hover {
+    background: #fafafa;
+    color: #70a9c7;
+  }
+`;
+const SyncText = styled.span`
+  font-size: 0.8rem;
+  margin-bottom: 0.7rem;
+  font-weight: 300;
+  color: #70a9c7;
+`;
+
 export const SongList = () => {
   const [likedSongs, setLikedSongs] = useState([]);
   const [dislikeSongs, setDislikeSongs] = useState([]);
@@ -89,6 +127,17 @@ export const SongList = () => {
     setLikedSongs(likedSongList);
     setDislikeSongs(dislikeSongList);
   };
+  const sync = async () => {
+    const platform = JSON.parse(`${localStorage.getItem("platform")}`);
+    
+    if (platform.name === "deezer") {
+      await getRecommendations();
+    }
+    else if (platform.name === "spotify") {
+      await getTopTracks();
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchSongs();
@@ -111,6 +160,12 @@ export const SongList = () => {
       <Content>
         <TitleContainer>
           <TitleText>My Songs</TitleText>
+          <ActionsContainer>
+          <SyncButton onClick={() => sync()}>
+            <SyncIcon className="fa-solid fa-arrows-rotate" />
+            <SyncText>Sync</SyncText>
+          </SyncButton>
+        </ActionsContainer>
         </TitleContainer>
         <RoomViewContainer>
           <SubTitleText>New Songs</SubTitleText>
@@ -122,14 +177,16 @@ export const SongList = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string } | null;
-                spotify: { previewUrl: string } | null;
+                deezer: { preview: string, link: string } | null;
+                spotify: { previewUrl: string, uri: string } | null;
               }) => {
                 return (
                   <SongCard
                     voting={voting}
                     deejai={false}
                     key={song.isrc}
+                    deezerLink={song.deezer ? song.deezer.link : ""}
+                    spotifyLink={song.spotify ? song.spotify.uri : ""}
                     deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
                     spotifyPreviewURL={
                       song.spotify ? song.spotify.previewUrl : ""
@@ -161,13 +218,15 @@ export const SongList = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string } | null;
-                spotify: { previewUrl: string } | null;
+                deezer: { preview: string, link: string } | null;
+                spotify: { previewUrl: string, uri: string } | null;
               }) => {
                 return (
                   <SongCard
                     deejai={false}
                     voting={voting}
+                    deezerLink={song.deezer ? song.deezer.link : ""}
+                    spotifyLink={song.spotify ? song.spotify.uri : ""}
                     key={song.isrc}
                     deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
                     spotifyPreviewURL={
@@ -200,14 +259,16 @@ export const SongList = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string } | null;
-                spotify: { previewUrl: string } | null;
+                deezer: { preview: string, link: string } | null;
+                spotify: { previewUrl: string, uri: string } | null;
               }) => {
                 return (
                   <SongCard
                     deejai={false}
                     voting={voting}
                     key={song.isrc}
+                    deezerLink={song.deezer ? song.deezer.link : ""}
+                    spotifyLink={song.spotify ? song.spotify.uri : ""}
                     deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
                     spotifyPreviewURL={
                       song.spotify ? song.spotify.previewUrl : ""

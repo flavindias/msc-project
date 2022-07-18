@@ -122,6 +122,8 @@ export const VoteCard = (props: {
   name: string;
   deezerPreviewURL: string;
   spotifyPreviewURL: string;
+  deezerLink: string;
+  spotifyLink: string;
   artists: {
     id: string;
     name: string;
@@ -156,6 +158,12 @@ export const VoteCard = (props: {
     setPlaying(false);
     audioRef.current.pause();
   };
+  const goToDeezer = () => {
+    window.open(props.deezerLink, "_blank");
+  }
+  const goToSpotify = () => {
+    window.open(props.spotifyLink, "_blank");
+  }
   return (
     <CardBg>
       <TitleRow>
@@ -183,14 +191,12 @@ export const VoteCard = (props: {
         />
         <SpotifyIcon
           spotifyPreviewURL={props.spotifyPreviewURL}
-          onClick={() => (playing ? pause() : play())}
+          onClick={() => goToSpotify()}
           className={"fa-brands fa-spotify"}
         />
         <DeezerIcon
           deezerPreviewURL={props.deezerPreviewURL}
-          onClick={() => {
-            playing ? pause() : play();
-          }}
+          onClick={() => goToDeezer()}
           className={"fa-brands fa-deezer"}
         />
       </CardFooter>
