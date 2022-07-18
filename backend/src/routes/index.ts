@@ -17,6 +17,7 @@ export const deejaiRoutes = () => {
     router.get('/rooms/:id', checkUser(), RoomController.get);
     router.post('/rooms', checkUser(), RoomController.create);
     router.post('/rooms/:id/join', checkUser(), RoomController.join);
+    router.post('/rooms/:id/track', checkUser(), RoomController.addTrack);
     router.get('/deezer/recommendation', checkUser(), DeezerController.getRecommendation);
     router.post('/deezer/isrc/:isrc', checkUser(), DeezerController.getSongInfoISRC);
     router.post('/spotify/sync', checkUser(), SpotifyController.syncTrack);

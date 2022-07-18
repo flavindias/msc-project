@@ -256,4 +256,49 @@ export const RoomController = {
       });
     }
   },
+  async addTrack(expressRequest: Request, res: Response) {
+    try{
+      const req = expressRequest as RequestCustom;
+      const { id } = req.params;
+      const { trackId } = req.body;
+      if (!id) throw new Error("RoomId is required");
+      if (!trackId) throw new Error("TrackId is required");
+      const room = await prisma.room.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (!room) throw new Error("Room not found");
+      if (room.ownerId !== req.user.id)
+        throw new Error("You can't add track to this room");
+      const roomTrack = await prisma.roomTracks.findFirst({
+        where: {
+          roomId: id,
+          trackId,
+        },
+      });
+      if (roomTrack) {
+        res.status(403).json({
+          message: "Track already in room",
+        });
+      } else {
+        const roomTrack = await prisma.roomTracks.create({
+          data: {
+            roomId: id,
+            trackId,
+          },
+        });
+        res.status(201).json({
+          message: "Track added to room",
+          roomTrack,
+        });
+      }
+
+    }
+    catch(err) {
+      res.status(500).json({
+        message: err,
+      });
+    }
+  }
 };

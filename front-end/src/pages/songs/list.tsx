@@ -63,7 +63,6 @@ const SongContainer = styled.div`
   }
 `;
 export const SongList = () => {
-  const [songs, setSongs] = useState([]);
   const [likedSongs, setLikedSongs] = useState([]);
   const [dislikeSongs, setDislikeSongs] = useState([]);
   const [newSongs, setNewSongs] = useState([]);

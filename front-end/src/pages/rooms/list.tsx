@@ -204,6 +204,7 @@ export const RoomList = () => {
     }
     fetchRooms();
   }, []);
+  
   return (
     <Container>
       <TitleContainer>

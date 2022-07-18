@@ -33,3 +33,22 @@ export const voteSong = async (trackId: string, vote: string) => {
     console.log(err);
   }
 };
+
+export const addToPlaylist = async (rooomId: string, trackId: string) => {
+  try {
+    const { data } = await axios.post(
+      `http://localhost:3001/api/rooms/${rooomId}/track`,
+      {
+        trackId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${getDeejaiToken().token}`,
+        },
+      }
+    );
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}

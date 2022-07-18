@@ -4,11 +4,9 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { getDeejaiToken } from "../../utils/auth";
 import { getTrackInfoByISRC } from "../../utils/deezer";
-import { getSongs } from "../../utils/deejai";
 import { getTrackInfoByISRC as getTrackInfoByISRCSpotify } from "../../utils/spotify";
-import { addToPlaylist } from "../../utils/deejai";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
-import { VoteCard } from "../../components/ui/VoteCard/VoteCard";
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -113,52 +111,6 @@ const SongContainer = styled.div`
     width: 100%;
   }
 `;
-
-const CarrouselWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-`;
-
-const Carrousel = styled.div`
-  width: 90vw;
-  display: flex;
-  overflow-x: scroll;
-  scroll-behavior: smooth;
-  /* use this property to hide the scrollbar on firefox */
-  /* scrollbar-width: none; */
-  /* ::-webkit-scrollbar {
-    display: none;
-  } */
-`;
-
-const ButtonLeft = styled.button`
-  order: none;
-  background-color: transparent;
-  cursor: pointer;
-  color: brown;
-  font-size: 5rem;
-  overflow: hidden;
-  z-index: 100;
-`;
-const ButtonRight = styled.button`
-  order: none;
-  background-color: transparent;
-  cursor: pointer;
-  color: brown;
-  font-size: 5rem;
-  overflow: hidden;
-  z-index: 100;
-`;
-
-const Item = styled.div`
-  flex-basis: 20%;
-  flex-shrink: 0;
-  padding: 1rem;
-  margin-right: 1rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-`;
 export interface IUserResult {
   id: string;
   name: string;
@@ -175,25 +127,10 @@ export interface IArtistResult {
   name: string;
 }
 
-export interface ITrackResult {
-  id: string;
-  name: string;
-  artist: IArtistResult;
-  deezer: {
-    preview: string;
-  };
-  spotify: {
-    previewUrl: string;
-  };
-  isrc: string;
-}
-
 export const RoomView = () => {
   const platform = JSON.parse(`${localStorage.getItem("platform")}`);
   const { id } = useParams();
   const [tracks, setTracks] = useState([]);
-  const [userSongs, setUserSongs] = useState<ITrackResult[]>([]);
-  const [vote, setVote] = useState(false);
   const [onlyDeezer, setOnlyDeezer] = useState<string[]>([]);
   const [onlySpotify, setOnlySpotify] = useState<string[]>([]);
   const [users, setUsers] = useState<IUserResult[] | undefined>([]);
@@ -231,14 +168,14 @@ export const RoomView = () => {
         return { ...trackInfo.track };
       }
     );
-    const onlyDeezerTracks = fetchedTracks
-      .filter((track: { spotify: any }) => {
+    const onlyDeezerTracks = fetchedTracks.filter(
+      (track: { spotify: any }) => {
         return !track.spotify;
-      })
-      .map((track: { isrc: string }) => track.isrc);
-    const onlySpotifyTracks = fetchedTracks
-      .filter((track: { deezer: any | null }) => !track.deezer)
-      .map((track: { isrc: string }) => track.isrc);
+      }
+    ).map((track: { isrc: string }) => track.isrc);
+    const onlySpotifyTracks = fetchedTracks.filter(
+      ( track: { deezer: any | null } ) => !track.deezer
+    ).map((track: { isrc: string }) => track.isrc);
     const fetchedArtists = room.tracks
       .map((trackInfo: { track: any }) => trackInfo.track.artist)
       .filter(
@@ -253,35 +190,12 @@ export const RoomView = () => {
     setOnlyDeezer(onlyDeezerTracks);
     setOnlySpotify(onlySpotifyTracks);
   };
-  const fetchUserSongs = async () => {
-    const songList = await getSongs();
-    setUserSongs(
-      songList.map((songItem: { vote: string; track: any }) => songItem.track)
-    );
-  };
   useEffect(() => {
     async function fetchRoom() {
       await fetchData();
-      if (!room.deejai) {
-        await fetchUserSongs();
-      }
     }
     fetchRoom();
   }, []);
-  useEffect(() => {
-    async function voting() {
-      if (vote) {
-        await fetchData();
-        setVote(true);
-      }
-    }
-    voting();
-  }, [vote]);
-
-  const voting = async (trackId: string) => {
-    await addToPlaylist(`${room.id}`, trackId)
-    setVote(true);
-  };
   if (platform.name === "deezer") {
     Promise.all(
       onlySpotify.map(async (isrc: string) => {
@@ -349,62 +263,12 @@ export const RoomView = () => {
               ))}
           </ProfileRow>
         </UsersContainer>
-        {!room.deejai && <SectionTitleText>Deejai</SectionTitleText>}
-        {!room.deejai && (
-          <CarrouselWrapper>
-            <Carrousel>
-              {userSongs &&
-                userSongs.map((song) => (
-                  <Item>
-                    <VoteCard
-                      voting={() => voting(song.id)}
-                      deejai={true}
-                      deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
-                      spotifyPreviewURL={
-                        song.spotify ? song.spotify.previewUrl : ""
-                      }
-                      name={song.name}
-                      artists={[
-                        {
-                          id: song.artist.id,
-                          name: song.artist.name,
-                          image: song.artist.picture,
-                        },
-                      ]}
-                      isrc={song.isrc}
-                      id={song.id}
-                    />
-                    {/* <SongCard
-                      voting={() => {}}
-                      deejai={room.deejai}
-                      key={song.isrc}
-                      deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
-                      spotifyPreviewURL={
-                        song.spotify ? song.spotify.previewUrl : ""
-                      }
-                      name={song.name}
-                      artists={[
-                        {
-                          id: song.artist.id,
-                          name: song.artist.name,
-                          image: song.artist.picture,
-                        },
-                      ]}
-                      isrc={`${song.isrc}`}
-                      status={"liked"}
-                      id={song.id}
-                    /> */}
-                  </Item>
-                ))}
-            </Carrousel>
-          </CarrouselWrapper>
-        )}
         <SectionTitleText>Songs</SectionTitleText>
         <RoomViewContainer>
           <SongContainer>
             {tracks.map(
               (song: {
-                artist: { id: string; name: string; picture: string };
+                artist: { id: string; name: string; picture: string; };
                 id: string;
                 name: string;
                 isrc: string;
@@ -415,7 +279,7 @@ export const RoomView = () => {
                 console.log(song);
                 return (
                   <SongCard
-                    voting={() => {}}
+                    voting={()=>{}}
                     deejai={room.deejai}
                     key={song.isrc}
                     deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
@@ -423,13 +287,7 @@ export const RoomView = () => {
                       song.spotify ? song.spotify.previewUrl : ""
                     }
                     name={song.name}
-                    artists={[
-                      {
-                        id: song.artist.id,
-                        name: song.artist.name,
-                        image: song.artist.picture,
-                      },
-                    ]}
+                    artists={[{id: song.artist.id, name: song.artist.name, image: song.artist.picture}]}
                     isrc={`${song.isrc}`}
                     status={"liked"}
                     id={song.id}

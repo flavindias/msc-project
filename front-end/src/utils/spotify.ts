@@ -87,10 +87,6 @@ export const getTrackInfoByISRC = async (isrc: string) => {
     if (!stored) throw new Error("No token stored");
     const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
     if(!authenticated) throw new Error("No deejai token stored");
-    console.log({
-      isrc,
-      token: stored.token,
-    })
     await axios.post(
       "http://localhost:3001/api/spotify/sync",
       {
