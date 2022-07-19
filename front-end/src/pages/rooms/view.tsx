@@ -9,6 +9,7 @@ import { getTrackInfoByISRC as getTrackInfoByISRCSpotify } from "../../utils/spo
 import { addToPlaylist } from "../../utils/deejai";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
 import { VoteCard } from "../../components/ui/VoteCard/VoteCard";
+import { ModalJoin } from "../../components/ui/ModalJoin/ModalJoin";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -201,6 +202,7 @@ export const RoomView = () => {
   const [users, setUsers] = useState<IUserResult[] | undefined>([]);
   const [owner, setOwner] = useState<IUserResult | undefined>(undefined);
   const [artists, setArtist] = useState<IArtistResult[] | undefined>(undefined);
+  const [modalJoin, setModalJoin] = useState(false);
   const [room, setRoom] = useState({
     id,
     name: "",
@@ -220,40 +222,52 @@ export const RoomView = () => {
   };
 
   const fetchData = async () => {
-    const response = await axios.get(`http://localhost:3001/api/rooms/${id}`, {
-      headers: {
-        Authorization: `Bearer ${getDeejaiToken().token}`,
-      },
-    });
-    const { room } = response.data;
-    const fetchedTracks = room.tracks.map(
-      (trackInfo: {
-        track: { deezer: any | null; isrc: string; spotify: any | null };
-      }) => {
-        return { ...trackInfo.track };
-      }
-    );
-    const onlyDeezerTracks = fetchedTracks
-      .filter((track: { spotify: any }) => {
-        return !track.spotify;
-      })
-      .map((track: { isrc: string }) => track.isrc);
-    const onlySpotifyTracks = fetchedTracks
-      .filter((track: { deezer: any | null }) => !track.deezer)
-      .map((track: { isrc: string }) => track.isrc);
-    const fetchedArtists = room.tracks
-      .map((trackInfo: { track: any }) => trackInfo.track.artist)
-      .filter(
-        (v: { id: any }, i: any, a: { id: any }[]) =>
-          a.findIndex((v2: { id: any }) => v2.id === v.id) === i
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/api/rooms/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getDeejaiToken().token}`,
+          },
+        }
       );
-    setTracks(fetchedTracks);
-    setUsers(room.users.map((userInfo: { user: any }) => userInfo.user));
-    setOwner(room.owner);
-    setRoom(room);
-    setArtist(fetchedArtists);
-    setOnlyDeezer(onlyDeezerTracks);
-    setOnlySpotify(onlySpotifyTracks);
+      const { status } = response;
+      console.log(response, "status");
+      const { room } = response.data;
+      const fetchedTracks = room.tracks.map(
+        (trackInfo: {
+          track: { deezer: any | null; isrc: string; spotify: any | null };
+        }) => {
+          return { ...trackInfo.track };
+        }
+      );
+      const onlyDeezerTracks = fetchedTracks
+        .filter((track: { spotify: any }) => {
+          return !track.spotify;
+        })
+        .map((track: { isrc: string }) => track.isrc);
+      const onlySpotifyTracks = fetchedTracks
+        .filter((track: { deezer: any | null }) => !track.deezer)
+        .map((track: { isrc: string }) => track.isrc);
+      const fetchedArtists = room.tracks
+        .map((trackInfo: { track: any }) => trackInfo.track.artist)
+        .filter(
+          (v: { id: any }, i: any, a: { id: any }[]) =>
+            a.findIndex((v2: { id: any }) => v2.id === v.id) === i
+        );
+      setTracks(fetchedTracks);
+      setUsers(room.users.map((userInfo: { user: any }) => userInfo.user));
+      setOwner(room.owner);
+      setRoom(room);
+      setArtist(fetchedArtists);
+      setOnlyDeezer(onlyDeezerTracks);
+      setOnlySpotify(onlySpotifyTracks);
+    } catch (error: any) {
+      error.response && error.response.status && console.log(error.response.status, "error");
+      if (error.response.status === 403) {
+        setModalJoin(true);
+      }
+    }
   };
   const fetchUserSongs = async () => {
     const songList = await getSongs();
@@ -279,7 +293,12 @@ export const RoomView = () => {
     }
     voting();
   }, [vote]);
-
+  useEffect(()=> {
+    async function fetchUsers() {
+      await fetchData();
+    }
+    fetchUsers();
+  }, [modalJoin])
   const voting = async (trackId: string) => {
     await addToPlaylist(`${room.id}`, trackId);
     await fetchData();
@@ -299,7 +318,10 @@ export const RoomView = () => {
       })
     );
   }
-
+  const toggleModal = () => {
+    setModalJoin(!modalJoin);
+  };
+  console.log(modalJoin, "modalJoin");
   return (
     <Container>
       <TitleContainer>
@@ -357,29 +379,38 @@ export const RoomView = () => {
           <CarrouselWrapper>
             <Carrousel>
               {userSongs &&
-                userSongs.map((song) => (
-                  <Item>
-                    <VoteCard
-                      voting={() => voting(song.id)}
-                      deejai={true}
-                      deezerLink={song.deezer ? song.deezer.link : ""}
-                      spotifyLink={song.spotify ? song.spotify.uri : ""}
-                      deezerPreviewURL={song.deezer ? song.deezer.preview : ""}
-                      spotifyPreviewURL={
-                        song.spotify ? song.spotify.previewUrl : ""
-                      }
-                      name={song.name}
-                      artists={[
-                        {
-                          id: song.artist.id,
-                          name: song.artist.name,
-                          image: song.artist.picture,
-                        },
-                      ]}
-                      isrc={song.isrc}
-                      id={song.id}
-                    />
-                    {/* <SongCard
+                userSongs
+                  .filter(
+                    (track) =>
+                      !tracks
+                        .map((track: { id: string }) => track.id)
+                        .includes(track.id)
+                  )
+                  .map((song) => (
+                    <Item>
+                      <VoteCard
+                        voting={() => voting(song.id)}
+                        deejai={true}
+                        deezerLink={song.deezer ? song.deezer.link : ""}
+                        spotifyLink={song.spotify ? song.spotify.uri : ""}
+                        deezerPreviewURL={
+                          song.deezer ? song.deezer.preview : ""
+                        }
+                        spotifyPreviewURL={
+                          song.spotify ? song.spotify.previewUrl : ""
+                        }
+                        name={song.name}
+                        artists={[
+                          {
+                            id: song.artist.id,
+                            name: song.artist.name,
+                            image: song.artist.picture,
+                          },
+                        ]}
+                        isrc={song.isrc}
+                        id={song.id}
+                      />
+                      {/* <SongCard
                       voting={() => {}}
                       deejai={room.deejai}
                       key={song.isrc}
@@ -399,8 +430,8 @@ export const RoomView = () => {
                       status={"liked"}
                       id={song.id}
                     /> */}
-                  </Item>
-                ))}
+                    </Item>
+                  ))}
             </Carrousel>
           </CarrouselWrapper>
         )}
@@ -414,10 +445,9 @@ export const RoomView = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string, link: string } | null;
-                spotify: { previewUrl: string, uri: string } | null;
+                deezer: { preview: string; link: string } | null;
+                spotify: { previewUrl: string; uri: string } | null;
               }) => {
-                console.log(song);
                 return (
                   <SongCard
                     voting={() => {}}
@@ -447,6 +477,7 @@ export const RoomView = () => {
           </SongContainer>
         </RoomViewContainer>
       </Content>
+      <ModalJoin toggleModal={() => toggleModal()} id={`${room.id}`} hide={!modalJoin} /> 
     </Container>
   );
 };

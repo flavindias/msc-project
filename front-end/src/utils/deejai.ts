@@ -16,9 +16,10 @@ export const getSongs = async () => {
 
 export const createRoom = async (name: string, deejai: boolean) => {
   try {
+    const nome = name === "" ? "Your room" : name;
     const { data } = await axios.post(
       "http://localhost:3001/api/rooms",
-      { name, deejai },
+      { name: nome, deejai },
       {
         headers: {
           Authorization: `Bearer ${getDeejaiToken().token}`,
@@ -30,6 +31,24 @@ export const createRoom = async (name: string, deejai: boolean) => {
     console.log(err);
   }
 }
+
+export const joinRoom = async (id: string) => {
+  try {
+    const { data } = await axios.post(
+      `http://localhost:3001/api/rooms/${id}/join`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${getDeejaiToken().token}`,
+        },
+      }
+    );
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 
 export const voteSong = async (trackId: string, vote: string) => {
   try {

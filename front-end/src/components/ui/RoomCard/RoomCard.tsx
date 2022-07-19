@@ -144,6 +144,10 @@ export const RoomCard = (props: {
 }) => {
   const navigate = useNavigate();
   const showArtists = props.artists.slice(0, 6);
+  const shareURL = () => {
+    navigator.clipboard.writeText(`http://localhost:3000/rooms/${props.id}`);
+    alert("URL successfully copied")
+  }
   return (
     <CardBg onClick={() => navigate(`/rooms/${props.id}`)}>
       <TitleRow>
@@ -153,8 +157,8 @@ export const RoomCard = (props: {
             new Date(props.updatedAt) &&
             formatDistanceToNow(new Date(props.updatedAt), { addSuffix: true })
           }`}</UpdateInfo>
-          <ShareIcon className="fa-solid fa-share" />
-          <DownloadIcon className="fa-solid fa-cloud-arrow-down" />
+          <ShareIcon onClick={()=>{shareURL()}} className="fa-solid fa-share" />
+          {/* <DownloadIcon className="fa-solid fa-cloud-arrow-down" /> */}
         </ShareArea>
       </TitleRow>
       <ArtistsRow>

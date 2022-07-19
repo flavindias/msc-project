@@ -62,6 +62,7 @@ const Role = styled.span`
   font-size: 0.8rem;
   font-weight: 300;
   color: #aeaeae;
+  cursor: pointer;
   @media (max-width: 768px) {
     font-size: 0.6rem;
   }

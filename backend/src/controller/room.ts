@@ -185,12 +185,14 @@ export const RoomController = {
         room.ownerId !== req.user.id &&
         !room.users.some((user) => user.userId === req.user.id)
       )
-        throw new Error("You are not allowed to access this room");
-      res.status(200).json({
+        return res.status(403).json({
+          message: "You are not allowed to access this room",
+        });
+      return res.status(200).json({
         room,
       });
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err,
       });
     }

@@ -129,6 +129,7 @@ export const SongList = () => {
     setNewSongs(newSongList);
     setLikedSongs(likedSongList);
     setDislikeSongs(dislikeSongList);
+    
   };
   const sync = async () => {
     const platform = JSON.parse(`${localStorage.getItem("platform")}`);
@@ -155,9 +156,9 @@ export const SongList = () => {
   }, [vote]);
 
   const voting = () => {
-    console.log("voting");
     setVote(true);
   };
+  
   return (
     <Container>
       <Content>
@@ -277,15 +278,13 @@ export const SongList = () => {
                       song.spotify ? song.spotify.previewUrl : ""
                     }
                     name={song.name}
-                    artists={
-                      [
-                        //   {
-                        //     id: song.artist.id,
-                        //     name: song.artist.name,
-                        //     image: song.artist.picture,
-                        //   },
-                      ]
-                    }
+                    artists={[
+                      {
+                        id: song.artist.id,
+                        name: song.artist.name,
+                        image: song.artist.picture,
+                      },
+                    ]}
                     isrc={`${song.isrc}`}
                     status={"DISLIKE"}
                     id={song.id}

@@ -116,6 +116,8 @@ const PlayIcon = styled.i`
     color: #1db954;
   }
 `;
+
+
 export const VoteCard = (props: {
   isrc: string;
   id: string;
@@ -141,8 +143,8 @@ export const VoteCard = (props: {
       ? props.spotifyPreviewURL
       : ""
   );
+  
   const audioRef = useRef(audio);
-
   const vote = async () => {
     pause();
     await voteSong(props.id, "LIKE");
@@ -151,6 +153,7 @@ export const VoteCard = (props: {
 
   const play = () => {
     setPlaying(true);
+    console.log(props.deezerPreviewURL)
     audioRef.current.play();
   };
 

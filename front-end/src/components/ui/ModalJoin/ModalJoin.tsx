@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { joinRoom } from "../../../utils/deejai";
 import styled from "styled-components";
 
 const ModalWrapper = styled.div`
@@ -87,23 +88,7 @@ const InputContainer = styled.div`
   width: 80%;
 `;
 
-const FormInput = styled.input`
-  width: 100%;
-  height: 2rem;
-  border-radius: 4px;
-  border: 1px solid #70a9c7;
-  /* padding: 0.5rem; */
-  font-size: 0.8rem;
-  font-weight: 300;
-  color: #70a9c7;
-  margin-bottom: 0.7rem;
-  /* margin-left: 1rem;
-  margin-right: 1rem; */
-  &:focus {
-    outline: none;
-  }
-`;
-const CheckboxContainer = styled.div`
+const DescriptionContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -113,29 +98,16 @@ const CheckboxContainer = styled.div`
   width: 80%;
 `;
 
-const Checkbox = styled.input`
-  width: 2rem;
-  height: 2rem;
-  border-radius: 4px;
-  border: 1px solid #70a9c7;
-  /* padding: 0.5rem; */
-  font-size: 0.8rem;
-  font-weight: 300;
-  color: #70a9c7;
-  margin-bottom: 0.7rem;
-  /* margin-left: 1rem;
-  margin-right: 1rem; */
-  &:focus {
-    outline: none;
-  }
-`;
-const CheckboxText = styled.span`
+const DescriptionText = styled.p`
   font-size: 0.8rem;
   font-weight: 300;
   color: #70a9c7;
   margin-left: 1rem;
   margin-right: 1rem;
 `;
+
+
+
 const CreateButton = styled.div`
   background: #70a9c7;
   border-radius: 4px;
@@ -165,48 +137,34 @@ const CreateButtonText = styled.span`
   margin-right: 1rem;
 `;
 
-export const Modal = (props: {
+export const ModalJoin = (props: {
   hide: boolean;
-  createRoomFn: (name: string, deejai: boolean) => void;
+  id: string;
   toggleModal: () => void;
 }) => {
-  const [name, setName] = useState("");
-  const [deejai, setDeejai] = useState(true);
-  const createRoom = async (name: string, deejai: boolean) => {
-    props.createRoomFn(name, deejai);
-    setName("");
-    setDeejai(true);
+  
+  const join = async () => {
+    await joinRoom(props.id);
+    props.toggleModal();
   };
   return (
     <ModalWrapper hideModal={props.hide} >
       <ModalContainer>
         <TitleContainer>
-          <TitleText>Create new room</TitleText>
+          <TitleText>Join room</TitleText>
           <ActionsContainer>
-            <CloseButton onClick={()=> props.toggleModal()}>
+            <CloseButton >
               <CloseIcon className="fas fa-times" />
             </CloseButton>
           </ActionsContainer>
         </TitleContainer>
         <FormContainer>
           <InputContainer>
-            <FormInput
-              onChange={(e) => setName(e.target.value)}
-              value={name}
-              type="text"
-              placeholder="Room name"
-            />
-            <CheckboxContainer>
-              <Checkbox
-                type="checkbox"
-                defaultChecked={deejai}
-                onChange={() => setDeejai(!deejai)}
-                placeholder="Deejai"
-              />
-              <CheckboxText>Deejai recommendations</CheckboxText>
-            </CheckboxContainer>
-            <CreateButton onClick={() => createRoom(name, deejai)}>
-              <CreateButtonText>Create Room</CreateButtonText>
+            <DescriptionContainer>
+              <DescriptionText>{`You want to enter the room with id: ${props.id}`}</DescriptionText>
+            </DescriptionContainer>
+            <CreateButton onClick={() => join()}>
+              <CreateButtonText>Join Room</CreateButtonText>
             </CreateButton>
           </InputContainer>
         </FormContainer>
