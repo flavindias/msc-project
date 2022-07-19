@@ -273,8 +273,6 @@ export const RoomController = {
       });
       if (!room) throw new Error("Room not found");
       const members = room.users.map(user => user.userId);
-      console.log(members);
-      console.log(members.includes(req.user.id));
       if (room.ownerId !== req.user.id && !members.includes(req.user.id))
         throw new Error("You can't add track to this room");
       const roomTrack = await prisma.roomTracks.findFirst({

@@ -14,7 +14,7 @@ const CardBg = styled.div`
   box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04),
     0px 0px 1px rgba(0, 0, 0, 0.04);
   border-radius: 8px;
-  padding: 1rem;
+  
   margin-bottom: 1rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -27,8 +27,8 @@ const TitleRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding: 1rem;
   justify-content: space-between;
-  margin-bottom: 1rem;
 `;
 const Title = styled.h1`
   font-size: 1.5rem;
@@ -68,10 +68,10 @@ const RoomId = styled.span`
 
 const ArtistsRow = styled.div`
   display: flex;
+  padding: 1rem;
   flex-direction: row;
   align-items: flex-start;
   justify-content: flex-start;
-  margin-bottom: 1rem;
 `;
 const ArtistElement = styled.div`
   display: flex;
@@ -81,10 +81,12 @@ const ArtistElement = styled.div`
   margin-right: 1rem;
 `;
 const ArtistImage = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   margin-bottom: 0.5rem;
+  max-width: 50px;
+  max-height: 50px;
 `;
 const ArtistName = styled.span`
   font-size: 0.5rem;
@@ -96,7 +98,7 @@ const CardFooter = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  padding: 1rem;
 `;
 const MembersArea = styled.div`
   display: flex;
@@ -141,7 +143,7 @@ export const RoomCard = (props: {
   }[];
 }) => {
   const navigate = useNavigate();
-  const showArtists = props.artists.slice(0, 8);
+  const showArtists = props.artists.slice(0, 6);
   return (
     <CardBg onClick={() => navigate(`/rooms/${props.id}`)}>
       <TitleRow>

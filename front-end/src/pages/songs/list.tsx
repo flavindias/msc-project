@@ -4,6 +4,7 @@ import { getSongs } from "../../utils/deejai";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
 import { getRecommendations } from "../../utils/deezer";
 import { getTopTracks } from "../../utils/spotify";
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -15,6 +16,7 @@ const Content = styled.div`
   display: flex;
   width: 80%;
   flex-direction: column;
+  align-items: center;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -26,7 +28,8 @@ const TitleContainer = styled.div`
   flex-direction: row;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  width: 80%;
+  width: 100%;
+
   @media (max-width: 768px) {
     width: 100%;
   }

@@ -18,6 +18,9 @@ const LogoContainer = styled.div`
   justify-content: center;
   align-self: center;
   margin-left: 1rem;
+  @media (max-width: 768px) {
+    margin-left: 0%;
+  }
 `;
 const LogoImage = styled.img`
   height: 100px;
@@ -35,6 +38,9 @@ const ProfileImage = styled.img`
   width: auto;
   border-radius: 50%;
   background: #faa;
+  @media (max-width: 768px) {
+    height: 25px;
+  }
 `;
 const NameContainer = styled.div`
   display: flex;
@@ -48,11 +54,17 @@ const Name = styled.span`
   font-size: 1rem;
   font-weight: 600;
   color: #404040;
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
 `;
 const Role = styled.span`
   font-size: 0.8rem;
   font-weight: 300;
   color: #aeaeae;
+  @media (max-width: 768px) {
+    font-size: 0.6rem;
+  }
 `;
 const NavLinkContainer = styled.div`
   display: flex;
@@ -67,6 +79,9 @@ const NavLink = styled.span`
   &:hover {
     background: #aeaeae;
     color: #fff;
+  }
+  @media (max-width: 768px) {
+    padding: 0.3rem;
   }
 `;
 const logout = () => {
@@ -89,7 +104,6 @@ export const NavBar = (props: {
   goToSongs: () => void;
   goToLogin: () => void;
 }) => {
-  
   const goHome = () => {
     props.goHome();
   };
@@ -100,11 +114,11 @@ export const NavBar = (props: {
     props.goToSongs();
   };
   console.log(props.user);
-  if(props.user && props.user.player === ''){
+  if (props.user && props.user.player === "") {
     console.log("user is null");
     props.goToLogin();
   }
-  if(!props.user){
+  if (!props.user) {
     console.log("user is null");
     props.goToLogin();
   }
@@ -116,7 +130,7 @@ export const NavBar = (props: {
       {props.user && (
         <NavLinkContainer>
           <NavLink onClick={() => goToRooms()}>Rooms</NavLink>
-          <NavLink onClick={() => goToSongs()}>My Songs</NavLink>
+          <NavLink onClick={() => goToSongs()}>Songs</NavLink>
         </NavLinkContainer>
       )}
       {props.user && (

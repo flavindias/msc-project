@@ -282,6 +282,7 @@ export const RoomView = () => {
 
   const voting = async (trackId: string) => {
     await addToPlaylist(`${room.id}`, trackId);
+    await fetchData();
     setVote(true);
   };
   if (platform.name === "deezer") {

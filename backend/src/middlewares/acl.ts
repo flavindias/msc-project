@@ -65,6 +65,7 @@ export const checkUser = () => {
       });
       if (!user) throw new Error("Permission Denied - User Not Found");
       req.user = user;
+      req.user.password = null
       next();
     } catch (err) {
       res.status(401).send({

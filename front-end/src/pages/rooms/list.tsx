@@ -7,6 +7,7 @@ import { getTopTracks } from "../../utils/spotify";
 import { getRecommendations } from "../../utils/deezer";
 import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
 import { Modal } from "../../components/ui/Modal/Modal";
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -18,6 +19,7 @@ const Content = styled.div`
   display: flex;
   width: 80%;
   flex-direction: column;
+  align-items: center;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -29,7 +31,7 @@ const TitleContainer = styled.div`
   flex-direction: row;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  width: 80%;
+  width: 100%;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -38,9 +40,31 @@ const TitleText = styled.h1`
   font-size: 1.5rem;
   font-weight: 600;
   color: #70a9c7;
-  margin-left: 1rem;
-  margin-right: 1rem;
 `;
+const RoomViewContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #fff;
+  flex-wrap: wrap;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+const RoomContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  align-content: center;
+  flex-wrap: wrap;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
 const ActionsContainer = styled.div`
   display: flex;
   align-items: center;
@@ -49,33 +73,33 @@ const ActionsContainer = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
 `;
-const SyncIcon = styled.i`
-  font-size: 1.5rem;
-  color: #70a9c7;
-  margin-right: 1rem;
-`;
+// const SyncIcon = styled.i`
+//   font-size: 1.5rem;
+//   color: #70a9c7;
+//   margin-right: 1rem;
+// `;
 
-const SyncButton = styled.div`
-  background: #ffffff;
-  border: 1px solid #70a9c7;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 300;
-  color: #70a9c7;
-  margin-right: 1rem;
-  cursor: pointer;
-  &:hover {
-    background: #fafafa;
-    color: #70a9c7;
-  }
-`;
-const SyncText = styled.span`
-  font-size: 0.8rem;
-  margin-bottom: 0.7rem;
-  font-weight: 300;
-  color: #70a9c7;
-`;
+// const SyncButton = styled.div`
+//   background: #ffffff;
+//   border: 1px solid #70a9c7;
+//   border-radius: 4px;
+//   padding: 0.5rem 1rem;
+//   font-size: 0.8rem;
+//   font-weight: 300;
+//   color: #70a9c7;
+//   margin-right: 1rem;
+//   cursor: pointer;
+//   &:hover {
+//     background: #fafafa;
+//     color: #70a9c7;
+//   }
+// `;
+// const SyncText = styled.span`
+//   font-size: 0.8rem;
+//   margin-bottom: 0.7rem;
+//   font-weight: 300;
+//   color: #70a9c7;
+// `;
 
 const FilterButton = styled.div`
   background: #ffffff;
@@ -107,17 +131,16 @@ const FilterIcon = styled.i`
 
 const sync = async () => {
   const platform = JSON.parse(`${localStorage.getItem("platform")}`);
-  
+
   if (platform.name === "deezer") {
     await getRecommendations();
-  }
-  else if (platform.name === "spotify") {
+  } else if (platform.name === "spotify") {
     await getTopTracks();
   }
 };
-const createNewRoom = async (name:string, deejai: boolean) => {
+const createNewRoom = async (name: string, deejai: boolean) => {
   await createRoom(name, deejai);
-}
+};
 export const RoomList = () => {
   const [showModalCreateRoom, setShowModalCreateRoom] = useState(true);
   const [rooms, setRooms] = useState([]);
@@ -164,8 +187,8 @@ export const RoomList = () => {
                 };
               }
             );
-            const members = room.users.map((member) => member.user)
-            
+            const members = room.users.map((member) => member.user);
+
             return {
               id: room.id,
               name: room.name,
@@ -180,20 +203,18 @@ export const RoomList = () => {
                   ? room.owner.deezer.picture
                   : "https://randomuser.me/api/portraits/men/8.jpg",
               },
-              members: members.map(
-                (member) => {
-                  console.log(member);
-                  return {
-                    id: member.id,
-                    name: member.name,
-                    image: member.spotify
-                      ? member.spotify.picture
-                      : member.deezer
-                      ? member.deezer.picture
-                      : "https://randomuser.me/api/portraits/men/8.jpg",
-                  };
-                }
-              ),
+              members: members.map((member) => {
+                console.log(member);
+                return {
+                  id: member.id,
+                  name: member.name,
+                  image: member.spotify
+                    ? member.spotify.picture
+                    : member.deezer
+                    ? member.deezer.picture
+                    : "https://randomuser.me/api/portraits/men/8.jpg",
+                };
+              }),
             };
           }
         )
@@ -205,6 +226,7 @@ export const RoomList = () => {
   useEffect(() => {
     async function fetchRooms() {
       await fetchRemoteRooms();
+      sync();
     }
     fetchRooms();
   }, []);
@@ -212,42 +234,47 @@ export const RoomList = () => {
     await createNewRoom(name, deejai);
     toggleModal();
     await fetchRemoteRooms();
-  }
+  };
   const toggleModal = () => {
     setShowModalCreateRoom(!showModalCreateRoom);
-  }
+  };
   return (
     <Container>
-      <TitleContainer>
-        <TitleText>{"Rooms"}</TitleText>
-        <ActionsContainer>
-          {/* <SyncButton onClick={() => sync()}>
-            <SyncIcon className="fa-solid fa-arrows-rotate" />
-            <SyncText>Sync</SyncText>
-          </SyncButton> */}
-          <FilterButton onClick={() => toggleModal()}>
-            <FilterIcon className="fa-solid fa-plus" />
-            <FilterText>Create</FilterText>
-          </FilterButton>
-        </ActionsContainer>
-      </TitleContainer>
       <Content>
-        {rooms.map((room) => {
-          const { members, owner, name, id, updatedAt, artists } = room;
-          return (
-            <RoomCard
-              key={id}
-              artists={artists}
-              members={members}
-              owner={owner}
-              title={name}
-              id={id}
-              updatedAt={updatedAt}
-            />
-          );
-        })}
+        <TitleContainer>
+          <TitleText>{"Rooms"}</TitleText>
+          <ActionsContainer>
+            <FilterButton onClick={() => toggleModal()}>
+              <FilterIcon className="fa-solid fa-plus" />
+              <FilterText>Create</FilterText>
+            </FilterButton>
+          </ActionsContainer>
+        </TitleContainer>
+
+        <RoomViewContainer>
+          <RoomContainer>
+            {rooms.map((room) => {
+              const { members, owner, name, id, updatedAt, artists } = room;
+              return (
+                <RoomCard
+                  key={id}
+                  artists={artists}
+                  members={members}
+                  owner={owner}
+                  title={name}
+                  id={id}
+                  updatedAt={updatedAt}
+                />
+              );
+            })}
+          </RoomContainer>
+        </RoomViewContainer>
       </Content>
-      <Modal toggleModal={()=>toggleModal()} createRoomFn={(name, deejai)=> newRoom(name, deejai)} hide={showModalCreateRoom}/>
+      <Modal
+        toggleModal={() => toggleModal()}
+        createRoomFn={(name, deejai) => newRoom(name, deejai)}
+        hide={showModalCreateRoom}
+      />
     </Container>
   );
 };
