@@ -27,7 +27,6 @@ const StreammingRow = styled.div`
   margin-bottom: 1rem;
   align-items: center;
   justify-content: space-evenly;
-  
 `;
 const StreamingElement = styled.div`
   display: flex;
@@ -48,6 +47,7 @@ const SpotifyContainer = styled.div`
   margin-top: 1rem;
   background-color: #1db954;
   border-radius: 8px;
+  cursor: pointer;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -69,6 +69,7 @@ const SpotifyTitle = styled.h1`
   font-weight: 400;
 `;
 const DeezerContainer = styled.div`
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -108,13 +109,12 @@ const spotifyLogin = () => {
 };
 
 const deezerLogin = () => {
-  const app_id ="502962"
+  const app_id = "502962";
   const redirect_uri = "http://localhost:3000/login";
   const url = `https://connect.deezer.com/oauth/auth.php?app_id=${app_id}&redirect_uri=${redirect_uri}&perms=basic_access,email`;
   window.location.href = url;
-}
+};
 export const SocialLogin = (props: { title: string }) => {
-  
   return (
     <CardContainer>
       <CardTitle>{props.title}</CardTitle>

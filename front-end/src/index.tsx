@@ -33,8 +33,6 @@ const routes = {
   songs: "/songs",
 };
 
-
-
 const WithNavLayout = () => {
   const navigate = useNavigate();
   const authenticated = isAuthenticated();
@@ -43,9 +41,18 @@ const WithNavLayout = () => {
     player: "",
     photo: "",
   });
+  const goToLogin = () => {
+    navigate("/");
+  }
   const goToHome = () => {
     navigate("/rooms");
-  }
+  };
+  const goToSongs = () => {
+    navigate("/songs");
+  };
+  const goToRooms = () => {
+    navigate("/rooms");
+  };
   useEffect(() => {
     async function fetchUser() {
       const user = await getUser();
@@ -59,12 +66,18 @@ const WithNavLayout = () => {
   } else {
     return (
       <AppContainer>
-        <NavBar goHome={() => goToHome()} logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"} user={user} />
+        <NavBar
+          goToLogin={() => goToLogin()}
+          goToRoom={() => goToRooms()}
+          goToSongs={() => goToSongs()}
+          goHome={() => goToHome()}
+          logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"}
+          user={user}
+        />
         <Outlet />
       </AppContainer>
     );
   }
-  
 };
 
 const root = ReactDOM.createRoot(

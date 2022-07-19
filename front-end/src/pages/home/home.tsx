@@ -28,7 +28,7 @@ const Content = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     width: 100%;
@@ -57,9 +57,6 @@ const SubTitle = styled.h2`
   font-weight: 400;
 `;
 
-
-
-
 const useQuery = async (navigate: NavigateFunction) => {
   const { hash, search } = useLocation();
   if (hash) {
@@ -79,7 +76,14 @@ export const HomePage = () => {
 
   return (
     <Container>
-      <NavBar goHome={() => {}} logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"} user={null} />
+      <NavBar
+        goToLogin={()=>{}}
+        goHome={() => {}}
+        goToRoom={() => {}}
+        goToSongs={() => {}}
+        logo={"https://i.ibb.co/7WyPN8Q/deejai-logo.png"}
+        user={null}
+      />
       <Content>
         <Caption>
           <Title>Simplifying your party</Title>

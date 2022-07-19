@@ -54,15 +54,28 @@ const Role = styled.span`
   font-weight: 300;
   color: #aeaeae;
 `;
-
+const NavLinkContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+const NavLink = styled.span`
+  text-decoration: none;
+  color: #aeaeae;
+  padding: 1rem;
+  &:hover {
+    background: #aeaeae;
+    color: #fff;
+  }
+`;
 const logout = () => {
   localStorage.removeItem("deezerToken");
   localStorage.removeItem("spotifyToken");
   localStorage.removeItem("deejaiToken");
   localStorage.removeItem("platform");
   window.location.reload();
-}
-
+};
 
 export const NavBar = (props: {
   logo: string;
@@ -72,15 +85,42 @@ export const NavBar = (props: {
     photo: string;
   } | null;
   goHome: () => void;
+  goToRoom: () => void;
+  goToSongs: () => void;
+  goToLogin: () => void;
 }) => {
+  const goToLogin = () => {
+    props.goToLogin();
+  }
   const goHome = () => {
     props.goHome();
+  };
+  const goToRooms = () => {
+    props.goToRoom();
+  };
+  const goToSongs = () => {
+    props.goToSongs();
+  };
+  console.log(props.user);
+  if(props.user && props.user.player === ''){
+    console.log("user is null");
+    props.goToLogin();
+  }
+  if(!props.user){
+    console.log("user is null");
+    props.goToLogin();
   }
   return (
     <NavContainer>
       <LogoContainer>
         <LogoImage onClick={() => goHome()} src={props.logo} alt="logo" />
       </LogoContainer>
+      {props.user && (
+        <NavLinkContainer>
+          <NavLink onClick={() => goToRooms()}>Rooms</NavLink>
+          <NavLink onClick={() => goToSongs()}>My Songs</NavLink>
+        </NavLinkContainer>
+      )}
       {props.user && (
         <UserContainer onClick={() => logout()}>
           <NameContainer>
@@ -93,5 +133,3 @@ export const NavBar = (props: {
     </NavContainer>
   );
 };
-
-

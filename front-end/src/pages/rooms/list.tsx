@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { getDeejaiToken } from "../../utils/auth";
-import { getRecommendations } from "../../utils/deezer";
+import { createRoom } from "../../utils/deejai";
 import { getTopTracks } from "../../utils/spotify";
+import { getRecommendations } from "../../utils/deezer";
 import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
-
+import { Modal } from "../../components/ui/Modal/Modal";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -114,8 +115,11 @@ const sync = async () => {
     await getTopTracks();
   }
 };
-
+const createNewRoom = async (name:string, deejai: boolean) => {
+  await createRoom(name, deejai);
+}
 export const RoomList = () => {
+  const [showModalCreateRoom, setShowModalCreateRoom] = useState(true);
   const [rooms, setRooms] = useState([]);
   const fetchRemoteRooms = async () => {
     try {
@@ -204,19 +208,26 @@ export const RoomList = () => {
     }
     fetchRooms();
   }, []);
-  
+  const newRoom = async (name: string, deejai: boolean) => {
+    await createNewRoom(name, deejai);
+    toggleModal();
+    await fetchRemoteRooms();
+  }
+  const toggleModal = () => {
+    setShowModalCreateRoom(!showModalCreateRoom);
+  }
   return (
     <Container>
       <TitleContainer>
         <TitleText>{"Rooms"}</TitleText>
         <ActionsContainer>
-          <SyncButton onClick={() => sync()}>
+          {/* <SyncButton onClick={() => sync()}>
             <SyncIcon className="fa-solid fa-arrows-rotate" />
             <SyncText>Sync</SyncText>
-          </SyncButton>
-          <FilterButton>
-            <FilterIcon className="fa-solid fa-filter" />
-            <FilterText>Filter</FilterText>
+          </SyncButton> */}
+          <FilterButton onClick={() => toggleModal()}>
+            <FilterIcon className="fa-solid fa-plus" />
+            <FilterText>Create</FilterText>
           </FilterButton>
         </ActionsContainer>
       </TitleContainer>
@@ -236,6 +247,7 @@ export const RoomList = () => {
           );
         })}
       </Content>
+      <Modal toggleModal={()=>toggleModal()} createRoomFn={(name, deejai)=> newRoom(name, deejai)} hide={showModalCreateRoom}/>
     </Container>
   );
 };
