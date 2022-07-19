@@ -55,7 +55,7 @@ export const DeezerController = {
               },
             });
           }
-          const newTrack = await prisma.track.findUnique({
+          await prisma.track.findUnique({
             where: {
               isrc: track.isrc,
             },

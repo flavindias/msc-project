@@ -1,5 +1,4 @@
 import axios from "axios";
-import db from "./mongo";
 import dotenv from "dotenv";
 import { Partitioners } from "kafkajs";
 import { KafkaConnection } from "./kafka";

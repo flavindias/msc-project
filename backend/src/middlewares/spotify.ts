@@ -231,12 +231,12 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
             uri: trackInfo.uri,
           },
         });
+        return track;
       }
       else{
         throw new Error("Track not found");
       }
       
-      return track;
     }
     else{
       return track;
@@ -244,6 +244,7 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
     
   } catch (error) {
     console.error(error);
+    return null;
   }
 };
 

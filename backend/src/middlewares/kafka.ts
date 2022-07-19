@@ -8,8 +8,8 @@ import {
   ITopicConfig,
 } from "kafkajs";
 dotenv.config();
-import { getTopTracks } from "./spotify";
-import { getRecommendation } from "./deezer";
+// import { getTopTracks } from "./spotify";
+// import { getRecommendation } from "./deezer";
 const { KAFKA_BROKERS, KAFKA_TOPICS, KAFKA_SYNC_TOPICS } = process.env;
 
 export class KafkaConnection {
