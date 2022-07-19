@@ -89,9 +89,7 @@ export const NavBar = (props: {
   goToSongs: () => void;
   goToLogin: () => void;
 }) => {
-  const goToLogin = () => {
-    props.goToLogin();
-  }
+  
   const goHome = () => {
     props.goHome();
   };
