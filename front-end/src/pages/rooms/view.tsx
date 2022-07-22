@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import { getDeejaiToken } from "../../utils/auth";
-import { getTrackInfoByISRC } from "../../utils/deezer";
-import { getSongs } from "../../utils/deejai";
-import { getTrackInfoByISRC as getTrackInfoByISRCSpotify } from "../../utils/spotify";
 import { addToPlaylist } from "../../utils/deejai";
+import { getSongs, getRoom } from "../../utils/deejai";
+import { getTrackInfoByISRC } from "../../utils/deezer";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
 import { VoteCard } from "../../components/ui/VoteCard/VoteCard";
 import { ModalJoin } from "../../components/ui/ModalJoin/ModalJoin";
+import { getTrackInfoByISRC as getTrackInfoByISRCSpotify } from "../../utils/spotify";
+import {Loader } from "../../components/ui/Loader/Loader";
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -133,24 +133,6 @@ const Carrousel = styled.div`
   } */
 `;
 
-const ButtonLeft = styled.button`
-  order: none;
-  background-color: transparent;
-  cursor: pointer;
-  color: brown;
-  font-size: 5rem;
-  overflow: hidden;
-  z-index: 100;
-`;
-const ButtonRight = styled.button`
-  order: none;
-  background-color: transparent;
-  cursor: pointer;
-  color: brown;
-  font-size: 5rem;
-  overflow: hidden;
-  z-index: 100;
-`;
 
 const Item = styled.div`
   flex-basis: 20%;
@@ -192,17 +174,18 @@ export interface ITrackResult {
 }
 
 export const RoomView = () => {
-  const platform = JSON.parse(`${localStorage.getItem("platform")}`);
   const { id } = useParams();
-  const [tracks, setTracks] = useState([]);
-  const [userSongs, setUserSongs] = useState<ITrackResult[]>([]);
   const [vote, setVote] = useState(false);
+  const [tracks, setTracks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [modalJoin, setModalJoin] = useState(false);
   const [onlyDeezer, setOnlyDeezer] = useState<string[]>([]);
   const [onlySpotify, setOnlySpotify] = useState<string[]>([]);
+  const [userSongs, setUserSongs] = useState<ITrackResult[]>([]);
   const [users, setUsers] = useState<IUserResult[] | undefined>([]);
+  const platform = JSON.parse(`${localStorage.getItem("platform")}`);
   const [owner, setOwner] = useState<IUserResult | undefined>(undefined);
   const [artists, setArtist] = useState<IArtistResult[] | undefined>(undefined);
-  const [modalJoin, setModalJoin] = useState(false);
   const [room, setRoom] = useState({
     id,
     name: "",
@@ -223,15 +206,8 @@ export const RoomView = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/rooms/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${getDeejaiToken().token}`,
-          },
-        }
-      );
-      const { room } = response.data;
+      setIsLoading(true);
+      const room = await getRoom(`${id}`);
       const fetchedTracks = room.tracks.map(
         (trackInfo: {
           track: { deezer: any | null; isrc: string; spotify: any | null };
@@ -260,20 +236,22 @@ export const RoomView = () => {
       setArtist(fetchedArtists);
       setOnlyDeezer(onlyDeezerTracks);
       setOnlySpotify(onlySpotifyTracks);
+      setIsLoading(false);
     } catch (error: any) {
       error.response &&
-        error.response.status &&
-        console.log(error.response.status, "error");
-      if (error.response.status === 403) {
-        setModalJoin(true);
-      }
+        error.response.status && error.response.status === 403 && setModalJoin(true);
+      // if (error.response.status === 403) {
+      //   setModalJoin(true);
+      // }
     }
   };
   const fetchUserSongs = async () => {
+    setIsLoading(true);
     const songList = await getSongs();
     setUserSongs(
       songList.map((songItem: { vote: string; track: any }) => songItem.track)
     );
+    setIsLoading(false);
   };
   useEffect(() => {
     async function fetchRoom() {
@@ -287,8 +265,10 @@ export const RoomView = () => {
   useEffect(() => {
     async function voting() {
       if (vote) {
+        setIsLoading(true);
         await fetchData();
         setVote(true);
+        setIsLoading(false);
       }
     }
     voting();
@@ -321,7 +301,6 @@ export const RoomView = () => {
   const toggleModal = () => {
     setModalJoin(!modalJoin);
   };
-  console.log(modalJoin, "modalJoin");
   return (
     <Container>
       <TitleContainer>
@@ -340,7 +319,7 @@ export const RoomView = () => {
                     ? owner.spotify.picture
                     : owner.deezer
                     ? owner.deezer.picture
-                    : "https://randomuser.me/api/portraits/men/8.jpg")
+                    : "https://via.placeholder.com/150")
                 }
               />
               <ProfileName>{`${owner && owner.name}`}</ProfileName>
@@ -354,7 +333,7 @@ export const RoomView = () => {
                         ? user.spotify.picture
                         : user.deezer
                         ? user.deezer.picture
-                        : "https://randomuser.me/api/portraits/men/8.jpg"
+                        : "https://via.placeholder.com/150"
                     }
                   />
                   <ProfileName>{`${user.name}`}</ProfileName>
@@ -488,6 +467,7 @@ export const RoomView = () => {
         id={`${room.id}`}
         hide={!modalJoin}
       />
+      <Loader isLoading={!modalJoin && isLoading} />
     </Container>
   );
 };

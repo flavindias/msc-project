@@ -16,7 +16,7 @@ const ModalWrapper = styled.div`
 `;
 const ModalContainer = styled.div`
   width: 80%;
-  height: 80%;
+  height: auto;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04),
@@ -167,14 +167,16 @@ const CreateButtonText = styled.span`
 
 export const Modal = (props: {
   hide: boolean;
-  createRoomFn: (name: string, deejai: boolean) => void;
+  createRoomFn: (name: string, deejai: boolean, duration:string) => void;
   toggleModal: () => void;
 }) => {
   const [name, setName] = useState("");
+  const [duration, setDuration] = useState("");
   const [deejai, setDeejai] = useState(true);
   const createRoom = async (name: string, deejai: boolean) => {
-    props.createRoomFn(name, deejai);
+    props.createRoomFn(name, deejai, duration);
     setName("");
+    setDuration("");
     setDeejai(true);
   };
   return (
@@ -195,6 +197,12 @@ export const Modal = (props: {
               value={name}
               type="text"
               placeholder="Room name"
+            />
+            <FormInput
+              onChange={(e) => setDuration(e.target.value)}
+              value={duration}
+              type="text"
+              placeholder="Duration in minutes"
             />
             <CheckboxContainer>
               <Checkbox

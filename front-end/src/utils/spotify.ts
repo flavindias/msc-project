@@ -1,6 +1,7 @@
 import axios from "axios";
 import { addHours } from "date-fns";
 import { NavigateFunction } from "react-router-dom";
+const { REACT_APP_API_URL } = process.env;
 
 const getLocalToken = () => JSON.parse(`${localStorage.getItem("spotifyToken")}`);
 export const getSpotifyToken = async (
@@ -19,7 +20,7 @@ export const getSpotifyToken = async (
     let picture = "https://i.ibb.co/7WyPN8Q/deejai-logo.png";
     if (images.length > 0) picture = images[0].url;
     const deejaiResponse = await axios.post(
-      "http://localhost:3001/api/auth/spotify",
+      `${REACT_APP_API_URL}/auth/spotify`,
       {
         id,
         product,
@@ -31,7 +32,6 @@ export const getSpotifyToken = async (
         display_name,
       }
     );
-    console.log(deejaiResponse);
     const { deejaiToken } = deejaiResponse.data;
 
     window.localStorage.setItem(
@@ -51,7 +51,7 @@ export const getSpotifyToken = async (
     );
     navigate("/rooms");
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
@@ -80,7 +80,7 @@ export const getTopTracks = async () => {
       })
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
@@ -91,7 +91,7 @@ export const getTrackInfoByISRC = async (isrc: string) => {
     const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
     if(!authenticated) throw new Error("No deejai token stored");
     await axios.post(
-      "http://localhost:3001/api/spotify/sync",
+      `${REACT_APP_API_URL}/spotify/sync`,
       {
         isrc,
         token: stored.token,
@@ -103,6 +103,6 @@ export const getTrackInfoByISRC = async (isrc: string) => {
       }
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }

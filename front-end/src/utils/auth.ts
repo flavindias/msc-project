@@ -1,4 +1,5 @@
 import axios from "axios";
+const { REACT_APP_API_URL } = process.env;
 
 export const isAuthenticated = () => {
 	const spotifyToken = localStorage.getItem('spotifyToken');
@@ -28,7 +29,7 @@ export const getDeejaiToken = () => {
 
 export const getUser = async () => {
 	try {
-	  const { data } = await axios.get("http://localhost:3001/api/auth/me", {
+	  const { data } = await axios.get(`${REACT_APP_API_URL}/auth/me`, {
 		headers: {
 		  Authorization: `Bearer ${getDeejaiToken().token}`,
 		},
@@ -41,10 +42,10 @@ export const getUser = async () => {
 		  ? user.spotify.picture
 		  : user.deezer
 		  ? user.deezer.picture
-		  : "https://randomuser.me/api/portraits/men/8.jpg",
+		  : "https://via.placeholder.com/150",
 	  };
 	  return userData;
 	} catch (err) {
-	  console.log(err);
+	  console.error(err);
 	}
   };

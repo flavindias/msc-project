@@ -1,6 +1,7 @@
 import axios from "axios";
 import { addHours } from "date-fns";
 import { NavigateFunction } from "react-router-dom";
+const { REACT_APP_API_URL } = process.env;
 
 const getLocalToken = () =>
   JSON.parse(`${localStorage.getItem("deezerToken")}`);
@@ -10,7 +11,7 @@ export const getDeezerToken = async (
   navigate: NavigateFunction
 ) => {
   try {
-    const { data } = await axios.post("http://localhost:3001/api/auth/deezer", {
+    const { data } = await axios.post(`${REACT_APP_API_URL}/auth/deezer`, {
       token: code,
     });
     window.localStorage.setItem(
@@ -30,7 +31,7 @@ export const getDeezerToken = async (
     window.localStorage.setItem("platform", JSON.stringify({ name: "deezer" }));
     navigate("/rooms");
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 export const getTrackInfoByISRC = async (isrc: string) => {
@@ -38,7 +39,7 @@ export const getTrackInfoByISRC = async (isrc: string) => {
     const stored = getLocalToken();
     const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
     const { data } = await axios.post(
-      `http://localhost:3001/api/deezer/isrc/${isrc}`,
+      `${REACT_APP_API_URL}/deezer/isrc/${isrc}`,
       {
         access_token: stored.token,
       },
@@ -53,7 +54,7 @@ export const getTrackInfoByISRC = async (isrc: string) => {
     );
     return data;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 export const getRecommendations = async () => {
@@ -61,8 +62,8 @@ export const getRecommendations = async () => {
     const stored = getLocalToken();
     const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
     if (!stored) throw new Error("No token stored");
-    const response = await axios.get(
-      "http://localhost:3001/api/deezer/recommendation",
+    await axios.get(
+      `${REACT_APP_API_URL}/deezer/recommendation`,
       {
         headers: {
           Authorization: `Bearer ${authenticated.token}`,
@@ -72,8 +73,7 @@ export const getRecommendations = async () => {
         },
       }
     );
-    console.log(response);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };

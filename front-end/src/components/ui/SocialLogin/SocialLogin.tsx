@@ -1,6 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-
+const {
+  REACT_APP_SPOTIFY_REDIRECT_URL,
+  REACT_APP_SPOTIFY_CLIENT_ID,
+  REACT_APP_SPOTIFY_SCOPE,
+  REACT_APP_DEEZER_APP_ID,
+  REACT_APP_DEEZER_REDIRECT_URL,
+  REACT_APP_DEEZER_APP_PERMISSIONS,
+} = process.env;
 const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -100,18 +107,19 @@ const DeezerTitle = styled.h1`
 `;
 
 const spotifyLogin = () => {
-  const client_id = "8e50fa5257fe4537b86253accb36a7fc";
-  const redirect_uri = "http://localhost:3000/";
-  const scope = "user-read-private user-read-email user-top-read";
+  const client_id = `${REACT_APP_SPOTIFY_CLIENT_ID}`;
+  const redirect_uri = `${REACT_APP_SPOTIFY_REDIRECT_URL}`;
+  const scope = `${REACT_APP_SPOTIFY_SCOPE}`;
   const response_type = "token";
   const url = `https://accounts.spotify.com/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}`;
   window.location.href = url;
 };
 
 const deezerLogin = () => {
-  const app_id = "502962";
-  const redirect_uri = "http://localhost:3000/";
-  const url = `https://connect.deezer.com/oauth/auth.php?app_id=${app_id}&redirect_uri=${redirect_uri}&perms=basic_access,email`;
+  const app_id = `${REACT_APP_DEEZER_APP_ID}`;
+  const redirect_uri = `${REACT_APP_DEEZER_REDIRECT_URL}`;
+  const permissions = `${REACT_APP_DEEZER_APP_PERMISSIONS}`;
+  const url = `https://connect.deezer.com/oauth/auth.php?app_id=${app_id}&redirect_uri=${redirect_uri}&perms=${permissions}`;
   window.location.href = url;
 };
 export const SocialLogin = (props: { title: string }) => {

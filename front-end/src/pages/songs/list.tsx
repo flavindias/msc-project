@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { getSongs } from "../../utils/deejai";
-import { SongCard } from "../../components/ui/SongCard/SongCard";
-import { getRecommendations } from "../../utils/deezer";
 import { getTopTracks } from "../../utils/spotify";
+import { getRecommendations } from "../../utils/deezer";
+import { Loader } from "../../components/ui/Loader/Loader";
+import { SongCard } from "../../components/ui/SongCard/SongCard";
 
 const Container = styled.div`
   display: flex;
@@ -104,11 +105,14 @@ const SyncText = styled.span`
 `;
 
 export const SongList = () => {
+  const [vote, setVote] = useState(false);
+  const [newSongs, setNewSongs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [likedSongs, setLikedSongs] = useState([]);
   const [dislikeSongs, setDislikeSongs] = useState([]);
-  const [newSongs, setNewSongs] = useState([]);
-  const [vote, setVote] = useState(false);
+  
   const fetchSongs = async () => {
+    setIsLoading(true);
     const songList = await getSongs();
     const newSongList = songList
       .filter(
@@ -129,7 +133,7 @@ export const SongList = () => {
     setNewSongs(newSongList);
     setLikedSongs(likedSongList);
     setDislikeSongs(dislikeSongList);
-    
+    setIsLoading(false);
   };
   const sync = async () => {
     const platform = JSON.parse(`${localStorage.getItem("platform")}`);
@@ -295,6 +299,7 @@ export const SongList = () => {
           </SongContainer>
         </RoomViewContainer>
       </Content>
+      <Loader isLoading={isLoading} />
     </Container>
   );
 };

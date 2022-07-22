@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import styled from "styled-components";
-import { getDeejaiToken } from "../../utils/auth";
-import { createRoom } from "../../utils/deejai";
 import { getTopTracks } from "../../utils/spotify";
 import { getRecommendations } from "../../utils/deezer";
-import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
 import { Modal } from "../../components/ui/Modal/Modal";
+import { createRoom, getRooms } from "../../utils/deejai";
+import { Loader } from "../../components/ui/Loader/Loader";
+import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
 
 const Container = styled.div`
   display: flex;
@@ -73,33 +72,6 @@ const ActionsContainer = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
 `;
-// const SyncIcon = styled.i`
-//   font-size: 1.5rem;
-//   color: #70a9c7;
-//   margin-right: 1rem;
-// `;
-
-// const SyncButton = styled.div`
-//   background: #ffffff;
-//   border: 1px solid #70a9c7;
-//   border-radius: 4px;
-//   padding: 0.5rem 1rem;
-//   font-size: 0.8rem;
-//   font-weight: 300;
-//   color: #70a9c7;
-//   margin-right: 1rem;
-//   cursor: pointer;
-//   &:hover {
-//     background: #fafafa;
-//     color: #70a9c7;
-//   }
-// `;
-// const SyncText = styled.span`
-//   font-size: 0.8rem;
-//   margin-bottom: 0.7rem;
-//   font-weight: 300;
-//   color: #70a9c7;
-// `;
 
 const FilterButton = styled.div`
   background: #ffffff;
@@ -138,100 +110,34 @@ const sync = async () => {
     await getTopTracks();
   }
 };
-const createNewRoom = async (name: string, deejai: boolean) => {
-  await createRoom(name, deejai);
+const createNewRoom = async (name: string, deejai: boolean, durationValue: string) => {
+  await createRoom(name, deejai, durationValue);
 };
 export const RoomList = () => {
   const [showModalCreateRoom, setShowModalCreateRoom] = useState(true);
   const [rooms, setRooms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const fetchRemoteRooms = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3001/api/rooms", {
-        headers: {
-          Authorization: `Bearer ${getDeejaiToken().token}`,
-        },
-      });
-
-      setRooms(
-        data.map(
-          (room: {
-            tracks: any;
-            id: any;
-            name: any;
-            updatedAt: any;
-            owner: {
-              id: any;
-              name: any;
-              spotify: { picture: any };
-              deezer: { picture: any };
-            };
-            users: {
-              user: {
-                id: string;
-                name: string;
-                spotify: { picture: string };
-                deezer: { picture: string };
-              };
-            }[];
-          }) => {
-            const artists = room.tracks.map(
-              (track: {
-                track: { artist: { id: any; name: any; picture: any } };
-              }) => {
-                return {
-                  id: track.track.artist.id,
-                  name: track.track.artist.name,
-                  image: track.track.artist.picture
-                    ? track.track.artist.picture
-                    : "https://via.placeholder.com/150",
-                };
-              }
-            );
-            const members = room.users.map((member) => member.user);
-
-            return {
-              id: room.id,
-              name: room.name,
-              updatedAt: room.updatedAt,
-              artists,
-              owner: {
-                id: room.owner.id,
-                name: room.owner.name,
-                image: room.owner.spotify
-                  ? room.owner.spotify.picture
-                  : room.owner.deezer
-                  ? room.owner.deezer.picture
-                  : "https://randomuser.me/api/portraits/men/8.jpg",
-              },
-              members: members.map((member) => {
-                console.log(member);
-                return {
-                  id: member.id,
-                  name: member.name,
-                  image: member.spotify
-                    ? member.spotify.picture
-                    : member.deezer
-                    ? member.deezer.picture
-                    : "https://randomuser.me/api/portraits/men/8.jpg",
-                };
-              }),
-            };
-          }
-        )
-      );
+      setIsLoading(true);
+      const rooms = await getRooms();
+      setRooms(rooms);
+      setIsLoading(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
   useEffect(() => {
     async function fetchRooms() {
+      setIsLoading(true);
       await fetchRemoteRooms();
       sync();
+      setIsLoading(false);
     }
     fetchRooms();
   }, []);
-  const newRoom = async (name: string, deejai: boolean) => {
-    await createNewRoom(name, deejai);
+  const newRoom = async (name: string, deejai: boolean, duration: string) => {
+    await createNewRoom(name, deejai, duration);
     toggleModal();
     await fetchRemoteRooms();
   };
@@ -272,9 +178,10 @@ export const RoomList = () => {
       </Content>
       <Modal
         toggleModal={() => toggleModal()}
-        createRoomFn={(name, deejai) => newRoom(name, deejai)}
+        createRoomFn={(name, deejai, duration) => newRoom(name, deejai, duration)}
         hide={showModalCreateRoom}
       />
+      <Loader isLoading={isLoading} />
     </Container>
   );
 };

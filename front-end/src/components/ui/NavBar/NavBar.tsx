@@ -114,13 +114,10 @@ export const NavBar = (props: {
   const goToSongs = () => {
     props.goToSongs();
   };
-  console.log(props.user);
   if (props.user && props.user.player === "") {
-    console.log("user is null");
     props.goToLogin();
   }
   if (!props.user) {
-    console.log("user is null");
     props.goToLogin();
   }
   return (

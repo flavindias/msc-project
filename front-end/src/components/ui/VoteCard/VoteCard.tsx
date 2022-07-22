@@ -153,7 +153,6 @@ export const VoteCard = (props: {
 
   const play = () => {
     setPlaying(true);
-    console.log(props.deezerPreviewURL)
     audioRef.current.play();
   };
 
