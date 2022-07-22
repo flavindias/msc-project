@@ -16,19 +16,22 @@ export const getSpotifyToken = async (
     if (!response.data.id) throw new Error("Authentication failed");
     const { id, product, country, images, type, uri, email, display_name } =
       response.data;
+    let picture = "https://i.ibb.co/7WyPN8Q/deejai-logo.png";
+    if (images.length > 0) picture = images[0].url;
     const deejaiResponse = await axios.post(
       "http://localhost:3001/api/auth/spotify",
       {
         id,
         product,
         country,
-        picture: images[0].url,
+        picture,
         type,
         uri,
         email,
         display_name,
       }
     );
+    console.log(deejaiResponse);
     const { deejaiToken } = deejaiResponse.data;
 
     window.localStorage.setItem(

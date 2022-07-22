@@ -101,7 +101,7 @@ const DeezerTitle = styled.h1`
 
 const spotifyLogin = () => {
   const client_id = "8e50fa5257fe4537b86253accb36a7fc";
-  const redirect_uri = "http://localhost:3000/login";
+  const redirect_uri = "http://localhost:3000/";
   const scope = "user-read-private user-read-email user-top-read";
   const response_type = "token";
   const url = `https://accounts.spotify.com/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}`;
@@ -110,7 +110,7 @@ const spotifyLogin = () => {
 
 const deezerLogin = () => {
   const app_id = "502962";
-  const redirect_uri = "http://localhost:3000/login";
+  const redirect_uri = "http://localhost:3000/";
   const url = `https://connect.deezer.com/oauth/auth.php?app_id=${app_id}&redirect_uri=${redirect_uri}&perms=basic_access,email`;
   window.location.href = url;
 };

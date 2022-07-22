@@ -14,7 +14,7 @@ const CardBg = styled.div`
   box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04),
     0px 0px 1px rgba(0, 0, 0, 0.04);
   border-radius: 8px;
-  
+
   margin-bottom: 1rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -52,9 +52,25 @@ const UpdateInfo = styled.span`
   margin-right: 1rem;
   font-style: italic;
 `;
+const ShareBox = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  vertical-align: middle;
+  margin-right: 1rem;
+`;
 const ShareIcon = styled.i`
   color: #42abc3;
   margin-left: 5px;
+`;
+const ShareText = styled.span`
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #aeaeae;
+  vertical-align: middle;
+  margin-left: 5px;
+  font-style: italic;
 `;
 const DownloadIcon = styled.i`
   color: #42abc3;
@@ -146,18 +162,25 @@ export const RoomCard = (props: {
   const showArtists = props.artists.slice(0, 6);
   const shareURL = () => {
     navigator.clipboard.writeText(`http://localhost:3000/rooms/${props.id}`);
-    alert("URL successfully copied")
-  }
+    alert("URL successfully copied");
+  };
   return (
     <CardBg onClick={() => navigate(`/rooms/${props.id}`)}>
       <TitleRow>
         <Title>{props.title}</Title>
-        <ShareArea>
+        <ShareArea
+          onClick={() => {
+            shareURL();
+          }}
+        >
           <UpdateInfo>{`Updated ${
             new Date(props.updatedAt) &&
             formatDistanceToNow(new Date(props.updatedAt), { addSuffix: true })
           }`}</UpdateInfo>
-          <ShareIcon onClick={()=>{shareURL()}} className="fa-solid fa-share" />
+          <ShareBox>
+            <ShareIcon className="fa-solid fa-share-nodes" />
+            <ShareText>Share</ShareText>
+          </ShareBox>
           {/* <DownloadIcon className="fa-solid fa-cloud-arrow-down" /> */}
         </ShareArea>
       </TitleRow>

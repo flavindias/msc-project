@@ -11877,13 +11877,6 @@ react-scripts@5.0.1:
   optionalDependencies:
     fsevents "^2.3.2"
 
-react-spotify-auth@^1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/react-spotify-auth/-/react-spotify-auth-1.4.3.tgz#69f206553e5b1e9533995318efb5fafc32aa4e67"
-  integrity sha512-XyIZD+frq+GOiNpFFi514/IhpqUUYArEeN1mB/qLhuyEe/omuoBTd36/lTNT5pf3qQ8I1u6tBabfwLy9G4Ch+g==
-  dependencies:
-    prop-types "^15.7.2"
-
 react-syntax-highlighter@^15.4.5:
   version "15.5.0"
   resolved "https://registry.yarnpkg.com/react-syntax-highlighter/-/react-syntax-highlighter-15.5.0.tgz#4b3eccc2325fa2ec8eff1e2d6c18fa4a9e07ab20"

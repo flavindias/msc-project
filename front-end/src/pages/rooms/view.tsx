@@ -231,8 +231,6 @@ export const RoomView = () => {
           },
         }
       );
-      const { status } = response;
-      console.log(response, "status");
       const { room } = response.data;
       const fetchedTracks = room.tracks.map(
         (trackInfo: {
@@ -263,7 +261,9 @@ export const RoomView = () => {
       setOnlyDeezer(onlyDeezerTracks);
       setOnlySpotify(onlySpotifyTracks);
     } catch (error: any) {
-      error.response && error.response.status && console.log(error.response.status, "error");
+      error.response &&
+        error.response.status &&
+        console.log(error.response.status, "error");
       if (error.response.status === 403) {
         setModalJoin(true);
       }
@@ -293,12 +293,12 @@ export const RoomView = () => {
     }
     voting();
   }, [vote]);
-  useEffect(()=> {
+  useEffect(() => {
     async function fetchUsers() {
       await fetchData();
     }
     fetchUsers();
-  }, [modalJoin])
+  }, [modalJoin]);
   const voting = async (trackId: string) => {
     await addToPlaylist(`${room.id}`, trackId);
     await fetchData();
@@ -368,7 +368,13 @@ export const RoomView = () => {
             {artists &&
               artists.map((artist) => (
                 <ProfileElement key={artist.id}>
-                  <ProfileImage src={artist.picture} />
+                  <ProfileImage
+                    src={
+                      artist.picture
+                        ? artist.picture
+                        : "https://via.placeholder.com/150"
+                    }
+                  />
                   <ProfileName>{`${artist.name}`}</ProfileName>
                 </ProfileElement>
               ))}
@@ -477,7 +483,11 @@ export const RoomView = () => {
           </SongContainer>
         </RoomViewContainer>
       </Content>
-      <ModalJoin toggleModal={() => toggleModal()} id={`${room.id}`} hide={!modalJoin} /> 
+      <ModalJoin
+        toggleModal={() => toggleModal()}
+        id={`${room.id}`}
+        hide={!modalJoin}
+      />
     </Container>
   );
 };
