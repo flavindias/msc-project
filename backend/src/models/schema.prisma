@@ -59,6 +59,7 @@ model Artist {
   spotify   SpotifyArtist?
   tracks    Track[]
   feats     Contributors[]
+  genres    ArtistGenres[] @relation("genres")
   createdAt DateTime       @default(now())
   updatedAt DateTime       @default(now())
 }
@@ -73,7 +74,6 @@ model DeezerArtist {
   tracklist String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-
 }
 
 model SpotifyArtist {
@@ -156,7 +156,7 @@ model UserTracks {
 model Room {
   id        String       @id @default(cuid())
   name      String
-  duration  Int          @default(60)
+  duration  Int?         @default(60)
   owner     User         @relation("owner", fields: [ownerId], references: [id])
   ownerId   String
   users     RoomUser[]
@@ -165,7 +165,6 @@ model Room {
   isPrivate Boolean      @default(false)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @default(now())
-
 }
 
 model RoomTracks {
@@ -198,6 +197,24 @@ model RoomVotes {
   vote      Vote       @default(NEUTRAL)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
+}
+
+model ArtistGenres {
+  id        String   @id @default(cuid())
+  artistId  String
+  artist    Artist   @relation("genres", fields: [artistId], references: [id])
+  genreId   String
+  genre     Genre    @relation("artists", fields: [genreId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Genre {
+  id        String         @id @default(cuid())
+  name      String @unique
+  artists   ArtistGenres[] @relation("artists")
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now())
 }
 
 enum Vote {

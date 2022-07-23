@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
-
+const { REACT_APP_APP_URL } = process.env;
 const CardBg = styled.div`
   width: 100%;
   height: 100%;
@@ -160,8 +160,10 @@ export const RoomCard = (props: {
 }) => {
   const navigate = useNavigate();
   const showArtists = props.artists.slice(0, 6);
-  const shareURL = () => {
-    navigator.clipboard.writeText(`http://localhost:3000/rooms/${props.id}`);
+  const shareURL = async () => {
+    await navigator.clipboard.writeText(
+      `${REACT_APP_APP_URL}/rooms/${props.id}`
+    );
     alert("URL successfully copied");
   };
   return (

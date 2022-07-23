@@ -110,9 +110,8 @@ export const SongList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [likedSongs, setLikedSongs] = useState([]);
   const [dislikeSongs, setDislikeSongs] = useState([]);
-  
+
   const fetchSongs = async () => {
-    setIsLoading(true);
     const songList = await getSongs();
     const newSongList = songList
       .filter(
@@ -133,22 +132,25 @@ export const SongList = () => {
     setNewSongs(newSongList);
     setLikedSongs(likedSongList);
     setDislikeSongs(dislikeSongList);
-    setIsLoading(false);
   };
   const sync = async () => {
+    setIsLoading(true);
     const platform = JSON.parse(`${localStorage.getItem("platform")}`);
-    
+
     if (platform.name === "deezer") {
       await getRecommendations();
-    }
-    else if (platform.name === "spotify") {
+    } else if (platform.name === "spotify") {
       await getTopTracks();
     }
+    await fetchSongs();
+    setIsLoading(false);
   };
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       await fetchSongs();
+      setIsLoading(false);
     };
     fetchData();
   }, []);
@@ -162,18 +164,18 @@ export const SongList = () => {
   const voting = () => {
     setVote(true);
   };
-  
+
   return (
     <Container>
       <Content>
         <TitleContainer>
           <TitleText>My Songs</TitleText>
           <ActionsContainer>
-          <SyncButton onClick={() => sync()}>
-            <SyncIcon className="fa-solid fa-arrows-rotate" />
-            <SyncText>Sync</SyncText>
-          </SyncButton>
-        </ActionsContainer>
+            <SyncButton onClick={() => sync()}>
+              <SyncIcon className="fa-solid fa-arrows-rotate" />
+              <SyncText>Sync</SyncText>
+            </SyncButton>
+          </ActionsContainer>
         </TitleContainer>
         <RoomViewContainer>
           <SubTitleText>New Songs</SubTitleText>
@@ -185,8 +187,8 @@ export const SongList = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string, link: string } | null;
-                spotify: { previewUrl: string, uri: string } | null;
+                deezer: { preview: string; link: string } | null;
+                spotify: { previewUrl: string; uri: string } | null;
               }) => {
                 return (
                   <SongCard
@@ -226,8 +228,8 @@ export const SongList = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string, link: string } | null;
-                spotify: { previewUrl: string, uri: string } | null;
+                deezer: { preview: string; link: string } | null;
+                spotify: { previewUrl: string; uri: string } | null;
               }) => {
                 return (
                   <SongCard
@@ -267,8 +269,8 @@ export const SongList = () => {
                 name: string;
                 isrc: string;
                 previewURL: string;
-                deezer: { preview: string, link: string } | null;
-                spotify: { previewUrl: string, uri: string } | null;
+                deezer: { preview: string; link: string } | null;
+                spotify: { previewUrl: string; uri: string } | null;
               }) => {
                 return (
                   <SongCard

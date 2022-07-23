@@ -8,8 +8,8 @@ const prisma = new PrismaClient();
 const saveNewTrack = async (spTrack: any) => {
   try {
     let artistId = "";
-    const { artists }  = spTrack;
-    if(artists && artists.length > 0){
+    const { artists } = spTrack;
+    if (artists && artists.length > 0) {
       const artist = artists[0];
       const { id, images, name, uri, href, external_urls } = artist;
       const checkArtist = await prisma.spotifyArtist.findUnique({
@@ -59,8 +59,7 @@ const saveNewTrack = async (spTrack: any) => {
           });
           artistId = newArtist.id;
         }
-    }
-    
+      }
     }
     const track = await prisma.track.findUnique({
       where: {
@@ -118,7 +117,7 @@ const saveNewTrack = async (spTrack: any) => {
     return track;
   } catch (err) {
     console.error(err);
-    return null
+    return null;
   }
 };
 
@@ -172,27 +171,26 @@ export const getTopTracks = async (token: string, userId: string) => {
   }
 };
 
-const getTrackInfo = async (isrc: string, token: string) => {
+export const getTrackInfo = async (isrc: string, token: string) => {
   try {
-    const  {data } = await axios.get(
+    const { data } = await axios.get(
       `https://api.spotify.com/v1/search?type=track&q=isrc:${isrc}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        params:{
+        params: {
           limit: 1,
           offset: 0,
-        }
+        },
       }
     );
-    if(data.tracks && data.tracks.items && data.tracks.items.length > 0){
+    if (data.tracks && data.tracks.items && data.tracks.items.length > 0) {
       return data.tracks.items[0];
     }
-    
+
     return null;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
   }
 };
@@ -211,13 +209,13 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
       const trackInfo = await getTrackInfo(isrc, token);
       if (trackInfo) {
         const newTrack = await saveNewTrack(trackInfo);
+        
+        await getArtistInfo(trackInfo.artistId, token);
         return newTrack;
-      }
-      else{
+      } else {
         throw new Error("Track not found");
       }
-    }
-    else if (track && !track.spotify) {
+    } else if (track && !track.spotify) {
       const trackInfo = await getTrackInfo(isrc, token);
       if (trackInfo) {
         await prisma.spotifyTrack.create({
@@ -232,19 +230,106 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
           },
         });
         return track;
+      } else {
+        await prisma.userTracks.deleteMany({
+          where: {
+            trackId: track.id,
+          },
+        });
+        await prisma.deezerTrack.delete({
+          where: {
+            trackId: track.id,
+          },
+        });
+        await prisma.roomTracks.deleteMany({
+          where: {
+            trackId: track.id,
+          },
+        });
+        await prisma.track.delete({
+          where: {
+            id: track.id,
+          },
+        });
+        // throw new Error("Track not found");
+        return null;
       }
-      else{
-        throw new Error("Track not found");
-      }
-      
-    }
-    else{
+    } else {
       return track;
     }
-    
   } catch (error) {
     console.error(error);
     return null;
+  }
+};
+
+export const getArtistInfo = async (artistId: string, token: string) => {
+  try {
+    
+    const artist = await prisma.artist.findFirst({
+      where: {
+        id: artistId,
+        
+      },
+      include: {
+        spotify: true
+      }
+    });
+    if(!artist) throw new Error("Artist not found.");
+    if(!artist.spotify) throw new Error("Spotify not registered");
+    const { data } = await axios.get(
+      `https://api.spotify.com/v1/artists/${artist.spotify.spotifyId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(data,"getInfo")
+    if (data.genres) {
+      await Promise.all(
+        data.genres.map(async (name: string) => {
+          const genre = await prisma.genre.findUnique({
+            where: {
+              name,
+            },
+          });
+          if (!genre) {
+            const newGenre = await prisma.genre.create({
+              data: {
+                name,
+              },
+            });
+            await prisma.artistGenres.create({
+              data: {
+                artistId: artist.id,
+                genreId: newGenre.id,
+              },
+            });
+          } else {
+            await prisma.artistGenres.create({
+              data: {
+                artistId: artist.id,
+                genreId: genre.id,
+              },
+            });
+          }
+        })
+      );
+    }
+    if(data.images && data.images.length !== 0 && artist.picture === ""){
+      await prisma.artist.update({
+        where: {
+          id: artist.id
+        },
+        data: {
+          picture: data.images[0].url
+        }
+      })
+
+    }
+  } catch (err) {
+    console.error(err);
   }
 };
 

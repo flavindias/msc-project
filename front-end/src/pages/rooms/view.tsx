@@ -8,8 +8,8 @@ import { SongCard } from "../../components/ui/SongCard/SongCard";
 import { VoteCard } from "../../components/ui/VoteCard/VoteCard";
 import { ModalJoin } from "../../components/ui/ModalJoin/ModalJoin";
 import { getTrackInfoByISRC as getTrackInfoByISRCSpotify } from "../../utils/spotify";
-import {Loader } from "../../components/ui/Loader/Loader";
-
+import { Loader } from "../../components/ui/Loader/Loader";
+const { REACT_APP_APP_URL } = process.env;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -133,7 +133,6 @@ const Carrousel = styled.div`
   } */
 `;
 
-
 const Item = styled.div`
   flex-basis: 20%;
   flex-shrink: 0;
@@ -141,6 +140,42 @@ const Item = styled.div`
   margin-right: 1rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
+`;
+
+const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+`;
+const ShareIcon = styled.i`
+  font-size: 1.5rem;
+  color: #70a9c7;
+  margin-right: 1rem;
+`;
+
+const ShareButton = styled.div`
+  background: #ffffff;
+  border: 1px solid #70a9c7;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #70a9c7;
+  margin-right: 1rem;
+  cursor: pointer;
+  &:hover {
+    background: #fafafa;
+    color: #70a9c7;
+  }
+`;
+const ShareText = styled.span`
+  font-size: 0.8rem;
+  margin-bottom: 0.7rem;
+  font-weight: 300;
+  color: #70a9c7;
 `;
 export interface IUserResult {
   id: string;
@@ -208,40 +243,48 @@ export const RoomView = () => {
     try {
       setIsLoading(true);
       const room = await getRoom(`${id}`);
-      const fetchedTracks = room.tracks.map(
-        (trackInfo: {
-          track: { deezer: any | null; isrc: string; spotify: any | null };
-        }) => {
-          return { ...trackInfo.track };
-        }
-      );
-      const onlyDeezerTracks = fetchedTracks
-        .filter((track: { spotify: any }) => {
-          return !track.spotify;
-        })
-        .map((track: { isrc: string }) => track.isrc);
-      const onlySpotifyTracks = fetchedTracks
-        .filter((track: { deezer: any | null }) => !track.deezer)
-        .map((track: { isrc: string }) => track.isrc);
-      const fetchedArtists = room.tracks
-        .map((trackInfo: { track: any }) => trackInfo.track.artist)
-        .filter(
-          (v: { id: any }, i: any, a: { id: any }[]) =>
-            a.findIndex((v2: { id: any }) => v2.id === v.id) === i
+      if (room.tracks) {
+        const fetchedTracks = room.tracks.map(
+          (trackInfo: {
+            track: { deezer: any | null; isrc: string; spotify: any | null };
+          }) => {
+            return { ...trackInfo.track };
+          }
         );
-      setTracks(fetchedTracks);
-      setUsers(room.users.map((userInfo: { user: any }) => userInfo.user));
-      setOwner(room.owner);
-      setRoom(room);
-      setArtist(fetchedArtists);
-      setOnlyDeezer(onlyDeezerTracks);
-      setOnlySpotify(onlySpotifyTracks);
+        const onlyDeezerTracks = fetchedTracks
+          .filter((track: { spotify: any }) => {
+            return !track.spotify;
+          })
+          .map((track: { isrc: string }) => track.isrc);
+        const onlySpotifyTracks = fetchedTracks
+          .filter((track: { deezer: any | null }) => !track.deezer)
+          .map((track: { isrc: string }) => track.isrc);
+        const fetchedArtists = room.tracks
+          .map((trackInfo: { track: any }) => trackInfo.track.artist)
+          .filter(
+            (v: { id: any }, i: any, a: { id: any }[]) =>
+              a.findIndex((v2: { id: any }) => v2.id === v.id) === i
+          );
+        setTracks(fetchedTracks);
+        setUsers(room.users.map((userInfo: { user: any }) => userInfo.user));
+        setOwner(room.owner);
+        setRoom(room);
+        setArtist(fetchedArtists);
+        setOnlyDeezer(onlyDeezerTracks);
+        setOnlySpotify(onlySpotifyTracks);
+      }
+
       setIsLoading(false);
     } catch (error: any) {
-      error.response &&
-        error.response.status && error.response.status === 403 && setModalJoin(true);
-      // if (error.response.status === 403) {
+      console.error(error, "error");
+      // if (
+      //   error.response &&
+      //   error.response.status &&
+      //   error.response.status === 403
+      // )
       //   setModalJoin(true);
+      setModalJoin(true);
+      // if (error.response.status === 403) {
       // }
     }
   };
@@ -252,6 +295,18 @@ export const RoomView = () => {
       songList.map((songItem: { vote: string; track: any }) => songItem.track)
     );
     setIsLoading(false);
+  };
+  const voting = async (trackId: string) => {
+    await addToPlaylist(`${room.id}`, trackId);
+    await fetchData();
+    setVote(true);
+  };
+  const toggleModal = () => {
+    setModalJoin(!modalJoin);
+  };
+  const shareURL = async () => {
+    await navigator.clipboard.writeText(`${REACT_APP_APP_URL}/rooms/${id}`);
+    alert("URL successfully copied");
   };
   useEffect(() => {
     async function fetchRoom() {
@@ -279,11 +334,7 @@ export const RoomView = () => {
     }
     fetchUsers();
   }, [modalJoin]);
-  const voting = async (trackId: string) => {
-    await addToPlaylist(`${room.id}`, trackId);
-    await fetchData();
-    setVote(true);
-  };
+
   if (platform.name === "deezer") {
     Promise.all(
       onlySpotify.map(async (isrc: string) => {
@@ -298,14 +349,19 @@ export const RoomView = () => {
       })
     );
   }
-  const toggleModal = () => {
-    setModalJoin(!modalJoin);
-  };
+
+  console.log(modalJoin, "modalJoin");
   return (
     <Container>
       <TitleContainer>
         <TitleText>{`${room.name}`}</TitleText>
         <RoomId>{`#${room.id}`}</RoomId>
+        <ActionsContainer>
+          <ShareButton onClick={() => shareURL()}>
+            <ShareIcon className="fa-solid fa-share-nodes" />
+            <ShareText>Share</ShareText>
+          </ShareButton>
+        </ActionsContainer>
       </TitleContainer>
       <Content>
         <SectionTitleText>Members</SectionTitleText>

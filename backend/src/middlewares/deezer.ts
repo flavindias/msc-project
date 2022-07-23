@@ -250,9 +250,9 @@ export const getRecommendation = async (accessToken: string, userId: string) => 
           },
         });
         if(newTrack && !newTrack?.spotify) {
-          await publish("spotify-new-track", JSON.stringify({
-            isrc: track.isrc,
-          }));
+          // await publish("spotify-new-track", JSON.stringify({
+          //   isrc: track.isrc,
+          // }));
         }
       })
     );
