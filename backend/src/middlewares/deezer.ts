@@ -1,30 +1,30 @@
 import axios from "axios";
 import dotenv from "dotenv";
-import { Partitioners } from "kafkajs";
-import { KafkaConnection } from "./kafka";
+// import { Partitioners } from "kafkajs";
+// import { KafkaConnection } from "./kafka";
 import { PrismaClient } from "@prisma/client";
 dotenv.config();
 
 const { DEEZER_APP_ID, DEEZER_APP_SECRET } = process.env;
 const prisma = new PrismaClient();
-const kafka = KafkaConnection.getKafka();
-const deezerProducer = kafka.producer({
-  createPartitioner: Partitioners.LegacyPartitioner,
-});
+// const kafka = KafkaConnection.getKafka();
+// const deezerProducer = kafka.producer({
+//   createPartitioner: Partitioners.LegacyPartitioner,
+// });
 
-export const publish = async (topic: string, data: string): Promise<void> => {
-  try {
-    await deezerProducer.connect();
-    await deezerProducer.send({
-      topic: topic,
-      messages: [{ value: data }],
-    });
+// export const publish = async (topic: string, data: string): Promise<void> => {
+//   try {
+//     await deezerProducer.connect();
+//     await deezerProducer.send({
+//       topic: topic,
+//       messages: [{ value: data }],
+//     });
 
-    await deezerProducer.disconnect();
-  } catch (error) {
-    console.error(error);
-  }
-}
+//     await deezerProducer.disconnect();
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
 
 export const getToken = async (code: string) => {
   try {
@@ -261,31 +261,6 @@ export const getRecommendation = async (accessToken: string, userId: string) => 
   }
 };
 
-export const run = async () => {
-  try{
-    // setInterval( async () => {
-    //   const user = await db.collection("deezerTokens").findOne();
-    //   console.log(user)
-    //   if (user) {
-    //     const tracks = await prisma.track.findMany({
-    //       where: {
-    //         deezer: null,
-    //       },
-    //       include: {
-    //         deezer: true,
-    //       },
-    //     });
-    //     Promise.all(
-    //       tracks.map(async (track) => {
-    //         await getTrackByISRC(track.isrc, user.token);
-    //       })
-    //     );
-    //   }
-    // }, 30000);
-  } catch (err) {
-    console.error(err);
-  }
-}
 
 export interface RecommendationReturn {
   id: number;
