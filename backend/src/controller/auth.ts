@@ -1,6 +1,6 @@
 import axios from "axios";
 import dotenv from "dotenv";
-import db from "../middlewares/mongo";
+// import db from "../middlewares/mongo";
 import { encodeUserToken } from "../middlewares/acl";
 import { Request, Response } from "express";
 import { compare, hashSync } from "bcryptjs";
@@ -89,13 +89,13 @@ export const AuthController = {
           },
         });
       }
-      const usr = {
-        userId: userResponse.id,
-        token,
-        createdAt: new Date(),
-      };
+      // const usr = {
+      //   userId: userResponse.id,
+      //   token,
+      //   createdAt: new Date(),
+      // };
       // await kafka.publish("spotify-login", JSON.stringify(usr));
-      await db.collection("spotifyTokens").insertOne(usr);
+      // await db.collection("spotifyTokens").insertOne(usr);
       return res
         .status(200)
         .json({
@@ -169,13 +169,13 @@ export const AuthController = {
           },
         });
       }
-      const usr = {
-        userId: userResponse.id,
-        token: authToken,
-        createdAt: new Date(),
-      };
+      // const usr = {
+      //   userId: userResponse.id,
+      //   token: authToken,
+      //   createdAt: new Date(),
+      // };
       // await kafka.publish("deezer-login", JSON.stringify(usr));
-      await db.collection("deezerTokens").insertOne(usr);
+      // await db.collection("deezerTokens").insertOne(usr);
       return res.status(200).json({
         user: userResponse,
         token: authToken,

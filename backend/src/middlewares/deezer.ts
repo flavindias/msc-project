@@ -12,7 +12,7 @@ const deezerProducer = kafka.producer({
   createPartitioner: Partitioners.LegacyPartitioner,
 });
 
-const publish = async (topic: string, data: string): Promise<void> => {
+export const publish = async (topic: string, data: string): Promise<void> => {
   try {
     await deezerProducer.connect();
     await deezerProducer.send({
