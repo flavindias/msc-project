@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { voteSong } from "../../../utils/deejai";
+import { useAnalyticsEventTracker } from "../../../utils/analytcs";
 
 const CardBg = styled.div`
   width: 20%;
@@ -153,6 +154,7 @@ export const SongCard = (props: {
   deejai: boolean;
   voting: () => void;
 }) => {
+  const gaEventTracker = useAnalyticsEventTracker('Song info');
   const [playing, setPlaying] = useState(false);
 
   const audio = new Audio(
@@ -167,27 +169,33 @@ export const SongCard = (props: {
   const like = async () => {
     pause();
     await voteSong(props.id, "LIKE");
+    gaEventTracker('Like');
     props.voting();
   };
   const dislike = async () => {
     pause();
     await voteSong(props.id, "DISLIKE");
+    gaEventTracker('Dislike');
     props.voting();
   };
 
   const play = () => {
     setPlaying(true);
+    gaEventTracker('Play');
     audioRef.current.play();
   };
 
   const pause = () => {
     setPlaying(false);
+    gaEventTracker('Pause');
     audioRef.current.pause();
   };
   const goToDeezer = () => {
+    gaEventTracker('Deezer');
     window.open(props.deezerLink, "_blank");
   }
   const goToSpotify = () => {
+    gaEventTracker('Spotify');
     window.open(props.spotifyLink, "_blank");
   }
   return (

@@ -5,6 +5,7 @@ import { getTopTracks } from "../../utils/spotify";
 import { getRecommendations } from "../../utils/deezer";
 import { Loader } from "../../components/ui/Loader/Loader";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
+import { useAnalyticsEventTracker } from "../../utils/analytcs";
 
 const Container = styled.div`
   display: flex;
@@ -105,6 +106,7 @@ const SyncText = styled.span`
 `;
 
 export const SongList = () => {
+  const gaEventTracker = useAnalyticsEventTracker('Song list');
   const [vote, setVote] = useState(false);
   const [newSongs, setNewSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,6 +137,7 @@ export const SongList = () => {
   };
   const sync = async () => {
     setIsLoading(true);
+    gaEventTracker('song sync')
     const platform = JSON.parse(`${localStorage.getItem("platform")}`);
 
     if (platform.name === "deezer") {

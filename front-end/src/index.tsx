@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
+import { initialize } from "react-ga";
 import styled from "styled-components";
 import {
   BrowserRouter,
@@ -17,6 +18,8 @@ import { RoomView } from "./pages/rooms/view";
 import { SongList } from "./pages/songs/list";
 import { isAuthenticated, getUser } from "./utils/auth";
 
+const {REACT_APP_TRACK_ID} = process.env;
+initialize(`${REACT_APP_TRACK_ID}`);
 const AppContainer = styled.div`
   display: flex;
   align-items: center;
@@ -43,7 +46,7 @@ const WithNavLayout = () => {
   });
   const goToLogin = () => {
     navigate("/");
-  }
+  };
   const goToHome = () => {
     navigate("/rooms");
   };

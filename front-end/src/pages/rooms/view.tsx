@@ -4,12 +4,14 @@ import { useParams } from "react-router-dom";
 import { addToPlaylist } from "../../utils/deejai";
 import { getSongs, getRoom } from "../../utils/deejai";
 import { getTrackInfoByISRC } from "../../utils/deezer";
+import { Loader } from "../../components/ui/Loader/Loader";
+import { useAnalyticsEventTracker } from "../../utils/analytcs";
 import { SongCard } from "../../components/ui/SongCard/SongCard";
 import { VoteCard } from "../../components/ui/VoteCard/VoteCard";
 import { ModalJoin } from "../../components/ui/ModalJoin/ModalJoin";
 import { getTrackInfoByISRC as getTrackInfoByISRCSpotify } from "../../utils/spotify";
-import { Loader } from "../../components/ui/Loader/Loader";
 const { REACT_APP_APP_URL } = process.env;
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -209,6 +211,8 @@ export interface ITrackResult {
 }
 
 export const RoomView = () => {
+  const gaEventTracker = useAnalyticsEventTracker('Room view');
+
   const { id } = useParams();
   const [vote, setVote] = useState(false);
   const [tracks, setTracks] = useState([]);
@@ -284,6 +288,7 @@ export const RoomView = () => {
       // )
       //   setModalJoin(true);
       setModalJoin(true);
+      gaEventTracker('room join')
       // if (error.response.status === 403) {
       // }
     }
@@ -306,6 +311,7 @@ export const RoomView = () => {
   };
   const shareURL = async () => {
     await navigator.clipboard.writeText(`${REACT_APP_APP_URL}/rooms/${id}`);
+    gaEventTracker('room share')
     alert("URL successfully copied");
   };
   useEffect(() => {

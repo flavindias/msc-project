@@ -6,6 +6,7 @@ import { Modal } from "../../components/ui/Modal/Modal";
 import { createRoom, getRooms } from "../../utils/deejai";
 import { Loader } from "../../components/ui/Loader/Loader";
 import { RoomCard } from "../../components/ui/RoomCard/RoomCard";
+import { useAnalyticsEventTracker } from "../../utils/analytcs";
 
 const Container = styled.div`
   display: flex;
@@ -114,6 +115,7 @@ const createNewRoom = async (name: string, deejai: boolean, durationValue: strin
   await createRoom(name, deejai, durationValue);
 };
 export const RoomList = () => {
+  const gaEventTracker = useAnalyticsEventTracker('Room list');
   const [showModalCreateRoom, setShowModalCreateRoom] = useState(true);
   const [rooms, setRooms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -139,6 +141,7 @@ export const RoomList = () => {
   const newRoom = async (name: string, deejai: boolean, duration: string) => {
     await createNewRoom(name, deejai, duration);
     toggleModal();
+    gaEventTracker('create room');
     await fetchRemoteRooms();
   };
   const toggleModal = () => {

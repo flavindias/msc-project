@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useAnalyticsEventTracker } from "../../../utils/analytcs";
 const {
   REACT_APP_SPOTIFY_REDIRECT_URL,
   REACT_APP_SPOTIFY_CLIENT_ID,
@@ -106,23 +107,27 @@ const DeezerTitle = styled.h1`
   font-weight: 400;
 `;
 
-const spotifyLogin = () => {
-  const client_id = `${REACT_APP_SPOTIFY_CLIENT_ID}`;
-  const redirect_uri = `${REACT_APP_SPOTIFY_REDIRECT_URL}`;
-  const scope = `${REACT_APP_SPOTIFY_SCOPE}`;
-  const response_type = "token";
-  const url = `https://accounts.spotify.com/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}`;
-  window.location.href = url;
-};
 
-const deezerLogin = () => {
-  const app_id = `${REACT_APP_DEEZER_APP_ID}`;
-  const redirect_uri = `${REACT_APP_DEEZER_REDIRECT_URL}`;
-  const permissions = `${REACT_APP_DEEZER_APP_PERMISSIONS}`;
-  const url = `https://connect.deezer.com/oauth/auth.php?app_id=${app_id}&redirect_uri=${redirect_uri}&perms=${permissions}`;
-  window.location.href = url;
-};
 export const SocialLogin = (props: { title: string }) => {
+  const gaEventTracker = useAnalyticsEventTracker('Login');
+  const spotifyLogin = () => {
+    gaEventTracker('spotify');
+    const client_id = `${REACT_APP_SPOTIFY_CLIENT_ID}`;
+    const redirect_uri = `${REACT_APP_SPOTIFY_REDIRECT_URL}`;
+    const scope = `${REACT_APP_SPOTIFY_SCOPE}`;
+    const response_type = "token";
+    const url = `https://accounts.spotify.com/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}`;
+    window.location.href = url;
+  };
+  
+  const deezerLogin = () => {
+    gaEventTracker('deezer');
+    const app_id = `${REACT_APP_DEEZER_APP_ID}`;
+    const redirect_uri = `${REACT_APP_DEEZER_REDIRECT_URL}`;
+    const permissions = `${REACT_APP_DEEZER_APP_PERMISSIONS}`;
+    const url = `https://connect.deezer.com/oauth/auth.php?app_id=${app_id}&redirect_uri=${redirect_uri}&perms=${permissions}`;
+    window.location.href = url;
+  };
   return (
     <CardContainer>
       <CardTitle>{props.title}</CardTitle>
