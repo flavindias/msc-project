@@ -113,7 +113,7 @@ export const getSongs = async () => {
 export const createRoom = async (name: string, deejai: boolean, durationValue: string) => {
   try {
     const nome = name === "" ? "Your room" : name;
-    const duration = !isNaN(parseInt(durationValue)) ? durationValue : "60";
+    const duration = !isNaN(parseInt(durationValue)) ? parseInt(durationValue) : null;
     const { data } = await axios.post(
       `${REACT_APP_API_URL}/rooms`,
       { name: nome, deejai, duration },
