@@ -116,6 +116,9 @@ export const RoomController = {
         const tracks = await prisma.userTracks.findMany({
           where: {
             userId: req.user.id,
+            vote: {
+              in: ["NEUTRAL", "LIKE"]
+            }
           },
         });
         const tracksToAdd = tracks.map((track) => {
@@ -232,16 +235,35 @@ export const RoomController = {
           },
         });
         if(room.deejai) {
+          const alreadyTracks = await prisma.roomTracks.findMany({
+            where: {
+              roomId: room.id
+            }
+          });
           const tracks = await prisma.userTracks.findMany({
             where: {
               userId: user.id,
+              vote: {
+                in: ["NEUTRAL", "LIKE"]
+              }
             },
           });
-          const tracksToAdd = tracks.map((track) => {
+
+          const tracksToAdd = [...tracks.map((track) => {
             return {
               roomId: room.id,
               trackId: track.trackId,
             };
+          }), ...alreadyTracks.map(track => {
+            return {
+              roomId: room.id,
+              trackId: track.trackId
+            }
+          })];
+          await prisma.roomTracks.deleteMany({
+            where: {
+              roomId: room.id
+            }
           });
           await prisma.roomTracks.createMany({
             data: tracksToAdd,

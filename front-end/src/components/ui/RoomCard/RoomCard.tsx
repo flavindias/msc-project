@@ -72,10 +72,6 @@ const ShareText = styled.span`
   margin-left: 5px;
   font-style: italic;
 `;
-const DownloadIcon = styled.i`
-  color: #42abc3;
-  margin-left: 5px;
-`;
 const RoomId = styled.span`
   font-size: 0.5rem;
   font-weight: 300;

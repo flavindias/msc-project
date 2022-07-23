@@ -5,9 +5,9 @@ import helmet from "helmet";
 import express from "express";
 import { deejaiRoutes } from "./routes";
 import mongoSanitize from "express-mongo-sanitize";
-import { KafkaConnection } from "./middlewares/kafka";
-import { run as SpotifyWatcher } from "./middlewares/spotify";
+// import { KafkaConnection } from "./middlewares/kafka";
 import { run as DeezerWatcher } from "./middlewares/deezer";
+import { run as SpotifyWatcher } from "./middlewares/spotify";
 
 dotenv.config();
 
@@ -29,10 +29,10 @@ app.use(express.urlencoded({ extended: true, limit: "1kb" }));
 
 app.use("/api", deejaiRoutes());
 
-const kafka: KafkaConnection = new KafkaConnection();
-kafka.run();
-SpotifyWatcher();
+// const kafka: KafkaConnection = new KafkaConnection();
+// kafka.run();
 DeezerWatcher();
+SpotifyWatcher();
 app.listen(API_PORT, () => {
   console.info(`API listening on port ${API_PORT}`);
 });

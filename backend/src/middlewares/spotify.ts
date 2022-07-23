@@ -218,17 +218,25 @@ export const getTrackByISRC = async (isrc: string, token: string) => {
     } else if (track && !track.spotify) {
       const trackInfo = await getTrackInfo(isrc, token);
       if (trackInfo) {
-        await prisma.spotifyTrack.create({
-          data: {
-            trackId: track.id,
-            spotifyId: trackInfo.id,
-            href: `${trackInfo.href}`,
-            isLocal: trackInfo.is_local,
-            popularity: trackInfo.popularity,
-            previewUrl: `${trackInfo.preview_url}`,
-            uri: trackInfo.uri,
-          },
-        });
+        const spotifyInfo = await prisma.spotifyTrack.findUnique({
+          where: {
+            trackId: track.id
+          }
+        })
+        if(!spotifyInfo){
+          await prisma.spotifyTrack.create({
+            data: {
+              trackId: track.id,
+              spotifyId: trackInfo.id,
+              href: `${trackInfo.href}`,
+              isLocal: trackInfo.is_local,
+              popularity: trackInfo.popularity,
+              previewUrl: `${trackInfo.preview_url}`,
+              uri: trackInfo.uri,
+            },
+          });
+        }
+       
         return track;
       } else {
         await prisma.userTracks.deleteMany({
@@ -285,7 +293,6 @@ export const getArtistInfo = async (artistId: string, token: string) => {
         },
       }
     );
-    console.log(data,"getInfo")
     if (data.genres) {
       await Promise.all(
         data.genres.map(async (name: string) => {
