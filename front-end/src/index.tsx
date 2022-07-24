@@ -16,6 +16,7 @@ import { NavBar } from "./components/ui/NavBar/NavBar";
 import { RoomList } from "./pages/rooms/list";
 import { RoomView } from "./pages/rooms/view";
 import { SongList } from "./pages/songs/list";
+import { Login } from "./pages/login/login";
 import { isAuthenticated, getUser } from "./utils/auth";
 
 const {REACT_APP_TRACK_ID} = process.env;
@@ -90,7 +91,7 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path={routes.login} element={<HomePage />} />
+      <Route path={routes.login} element={<Login />} />
       <Route element={<WithNavLayout />}>
         <Route path={routes.rooms} element={<RoomList />} />
         <Route path={routes.room} element={<RoomView />} />

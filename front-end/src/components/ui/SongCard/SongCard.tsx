@@ -208,10 +208,10 @@ export const SongCard = (props: {
             status={props.status}
             className={"fas fa-thumbs-up"}
           />
-          <NewIcon
+          {/* <NewIcon
             status={props.status}
             className={"fa-solid fa-certificate"}
-          />
+          /> */}
           <DislikeIcon
             onClick={() => dislike()}
             status={props.status}

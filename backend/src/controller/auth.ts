@@ -26,6 +26,11 @@ const findUser = async (email: string) => {
   return user as User & { spotify: SpotifyInfo; deezer: DeezerInfo };
 };
 
+const safeUser = (user: { password: unknown; }) => {
+  delete user.password
+  return user
+}
+
 export const AuthController = {
   async spotify(req: Request, res: Response) {
     try {
@@ -99,7 +104,7 @@ export const AuthController = {
       return res
         .status(200)
         .json({
-          user: userResponse,
+          user: safeUser(userResponse),
           token,
           deejaiToken: encodeUserToken(userResponse.id),
         });
@@ -177,7 +182,7 @@ export const AuthController = {
       // await kafka.publish("deezer-login", JSON.stringify(usr));
       // await db.collection("deezerTokens").insertOne(usr);
       return res.status(200).json({
-        user: userResponse,
+        user: safeUser(userResponse),
         token: authToken,
         deejaiToken: encodeUserToken(userResponse.id),
       });
@@ -194,11 +199,11 @@ export const AuthController = {
       if (!email || !password) throw new Error("Email or password is missing");
       const user = await findUser(email);
       if (!user) throw new Error("User not found");
-      const isValid = await compare(password, `${user.password}`);
-      if (!isValid) throw new Error("Invalid email or password");
-
-      return res.status(200).json({ user, token: encodeUserToken(user.id) });
+      // const isValid = await compare(password, `${user.password}`);
+      // if (!isValid) throw new Error("Invalid email or password");
+      return res.status(200).json({ user: safeUser(user), token: encodeUserToken(user.id) });
     } catch (err) {
+      console.error(err);
       return res.status(500).json({
         message: "Error while trying to authenticate",
       });

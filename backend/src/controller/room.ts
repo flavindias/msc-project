@@ -159,6 +159,7 @@ export const RoomController = {
           },
           users: {
             include: {
+              
               user: {
                 include: {
                   votes: true,
@@ -171,12 +172,21 @@ export const RoomController = {
 
           tracks: {
             include: {
+              
               track: {
                 include: {
                   artist: true,
                   contributors: true,
                   deezer: true,
                   spotify: true,
+                  UserTracks: {
+                    where: {
+                      userId: req.user.id
+                    },
+                    select: {
+                      vote: true
+                    }
+                  }
                 },
               },
             },

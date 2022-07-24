@@ -250,7 +250,7 @@ export const RoomView = () => {
       if (room.tracks) {
         const fetchedTracks = room.tracks.map(
           (trackInfo: {
-            track: { deezer: any | null; isrc: string; spotify: any | null };
+            track: { deezer: any | null; isrc: string; spotify: any | null, Usertracks: any | null };
           }) => {
             return { ...trackInfo.track };
           }
@@ -356,7 +356,6 @@ export const RoomView = () => {
     );
   }
 
-  console.log(modalJoin, "modalJoin");
   return (
     <Container>
       <TitleContainer>
@@ -436,7 +435,7 @@ export const RoomView = () => {
                   .map((song) => (
                     <Item>
                       <VoteCard
-                        voting={() => voting(song.id)}
+                        voting={() => {voting(song.id)}}
                         deejai={true}
                         deezerLink={song.deezer ? song.deezer.link : ""}
                         spotifyLink={song.spotify ? song.spotify.uri : ""}
@@ -487,14 +486,16 @@ export const RoomView = () => {
           <SongContainer>
             {tracks.map(
               (song: {
-                artist: { id: string; name: string; picture: string };
                 id: string;
+                artist: { id: string; name: string; picture: string };
                 name: string;
                 isrc: string;
                 previewURL: string;
                 deezer: { preview: string; link: string } | null;
                 spotify: { previewUrl: string; uri: string } | null;
+                UserTracks: {vote:  string}[];
               }) => {
+                console.log(song);
                 return (
                   <SongCard
                     voting={() => {}}
@@ -515,7 +516,7 @@ export const RoomView = () => {
                       },
                     ]}
                     isrc={`${song.isrc}`}
-                    status={"liked"}
+                    status={song.UserTracks.length !== 0 ? song.UserTracks[0].vote : "neutral"}
                     id={song.id}
                   />
                 );

@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+
 const NavContainer = styled.header`
   width: 100%;
   height: 64px;
@@ -85,13 +87,7 @@ const NavLink = styled.span`
     padding: 0.3rem;
   }
 `;
-const logout = () => {
-  localStorage.removeItem("deezerToken");
-  localStorage.removeItem("spotifyToken");
-  localStorage.removeItem("deejaiToken");
-  localStorage.removeItem("platform");
-  window.location.reload();
-};
+
 
 export const NavBar = (props: {
   logo: string;
@@ -105,6 +101,14 @@ export const NavBar = (props: {
   goToSongs: () => void;
   goToLogin: () => void;
 }) => {
+  const navigate = useNavigate();
+  const logout = () => {
+    localStorage.removeItem("deezerToken");
+    localStorage.removeItem("spotifyToken");
+    localStorage.removeItem("deejaiToken");
+    localStorage.removeItem("platform");
+    navigate("/");
+  };
   const goHome = () => {
     props.goHome();
   };
