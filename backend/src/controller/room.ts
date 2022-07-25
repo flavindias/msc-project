@@ -183,10 +183,7 @@ export const RoomController = {
                   spotify: true,
                   deezer: true,
             },
-            // include: {
-            //   spotify: true,
-            //   deezer: true,
-            // }
+            
           },
           users: {
             include: {
@@ -199,11 +196,7 @@ export const RoomController = {
                       deezer: true,
                       votes: true
                 },
-                // include: {
-                //   votes: true,
-                //   spotify: true,
-                //   deezer: true,
-                // }
+                
               }
             },
 
@@ -289,6 +282,7 @@ export const RoomController = {
             }
           });
           const tracks = await prisma.userTracks.findMany({
+            take: 15,
             where: {
               userId: user.id,
               vote: {
@@ -307,7 +301,7 @@ export const RoomController = {
               roomId: room.id,
               trackId: track.trackId
             }
-          })];
+          })].filter((v,i,a)=>a.findIndex(v2=>(v2.trackId===v.trackId))===i);
           await prisma.roomTracks.deleteMany({
             where: {
               roomId: room.id
