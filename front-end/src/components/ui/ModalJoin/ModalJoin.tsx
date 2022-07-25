@@ -17,7 +17,7 @@ const ModalWrapper = styled.div`
 `;
 const ModalContainer = styled.div`
   width: 80%;
-  height: 80%;
+  height: auto;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04),

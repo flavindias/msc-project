@@ -47,6 +47,10 @@ const RoomViewContainer = styled.div`
   width: 100%;
   background-color: #fff;
   flex-wrap: wrap;
+  ::after {
+    content: "";
+    flex: auto;
+  }
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -60,6 +64,10 @@ const RoomContainer = styled.div`
   justify-content: space-between;
   align-content: center;
   flex-wrap: wrap;
+  ::after {
+    content: "";
+    flex: auto;
+  }
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -111,11 +119,15 @@ const sync = async () => {
     await getTopTracks();
   }
 };
-const createNewRoom = async (name: string, deejai: boolean, durationValue: string) => {
+const createNewRoom = async (
+  name: string,
+  deejai: boolean,
+  durationValue: string
+) => {
   await createRoom(name, deejai, durationValue);
 };
 export const RoomList = () => {
-  const gaEventTracker = useAnalyticsEventTracker('Room list');
+  const gaEventTracker = useAnalyticsEventTracker("Room list");
   const [showModalCreateRoom, setShowModalCreateRoom] = useState(true);
   const [rooms, setRooms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -141,7 +153,7 @@ export const RoomList = () => {
   const newRoom = async (name: string, deejai: boolean, duration: string) => {
     await createNewRoom(name, deejai, duration);
     toggleModal();
-    gaEventTracker('create room');
+    gaEventTracker("create room");
     await fetchRemoteRooms();
   };
   const toggleModal = () => {
@@ -181,7 +193,9 @@ export const RoomList = () => {
       </Content>
       <Modal
         toggleModal={() => toggleModal()}
-        createRoomFn={(name, deejai, duration) => newRoom(name, deejai, duration)}
+        createRoomFn={(name, deejai, duration) =>
+          newRoom(name, deejai, duration)
+        }
         hide={showModalCreateRoom}
       />
       <Loader isLoading={isLoading} />

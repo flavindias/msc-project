@@ -52,6 +52,10 @@ const RoomViewContainer = styled.div`
   width: 100%;
   background-color: #fff;
   flex-wrap: wrap;
+  ::after {
+    content: "";
+    flex: auto;
+  }
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -65,6 +69,10 @@ const SongContainer = styled.div`
   justify-content: space-between;
   align-content: center;
   flex-wrap: wrap;
+  ::after {
+    content: "";
+    flex: auto;
+  }
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -106,7 +114,7 @@ const SyncText = styled.span`
 `;
 
 export const SongList = () => {
-  const gaEventTracker = useAnalyticsEventTracker('Song list');
+  const gaEventTracker = useAnalyticsEventTracker("Song list");
   const [vote, setVote] = useState(false);
   const [newSongs, setNewSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -137,7 +145,7 @@ export const SongList = () => {
   };
   const sync = async () => {
     setIsLoading(true);
-    gaEventTracker('song sync')
+    gaEventTracker("song sync");
     const platform = JSON.parse(`${localStorage.getItem("platform")}`);
 
     if (platform.name === "deezer") {

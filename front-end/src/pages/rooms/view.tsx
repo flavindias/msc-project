@@ -56,6 +56,10 @@ const RoomViewContainer = styled.div`
   width: 100%;
   background-color: #fff;
   flex-wrap: wrap;
+  ::after {
+    content: "";
+    flex: auto;
+  }
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -78,6 +82,10 @@ const ProfileRow = styled.div`
   justify-content: flex-start;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+  ::after {
+    content: "";
+    flex: auto;
+  }
 `;
 const ProfileElement = styled.div`
   display: flex;
@@ -112,6 +120,10 @@ const SongContainer = styled.div`
   justify-content: space-between;
   align-content: center;
   flex-wrap: wrap;
+  ::after {
+    content: "";
+    flex: auto;
+  }
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -211,7 +223,7 @@ export interface ITrackResult {
 }
 
 export const RoomView = () => {
-  const gaEventTracker = useAnalyticsEventTracker('Room view');
+  const gaEventTracker = useAnalyticsEventTracker("Room view");
 
   const { id } = useParams();
   const [vote, setVote] = useState(false);
@@ -250,7 +262,12 @@ export const RoomView = () => {
       if (room.tracks) {
         const fetchedTracks = room.tracks.map(
           (trackInfo: {
-            track: { deezer: any | null; isrc: string; spotify: any | null, evaluation: any | null };
+            track: {
+              deezer: any | null;
+              isrc: string;
+              spotify: any | null;
+              evaluation: any | null;
+            };
           }) => {
             return { ...trackInfo.track };
           }
@@ -288,7 +305,7 @@ export const RoomView = () => {
       // )
       //   setModalJoin(true);
       setModalJoin(true);
-      gaEventTracker('room join')
+      gaEventTracker("room join");
       // if (error.response.status === 403) {
       // }
     }
@@ -308,13 +325,13 @@ export const RoomView = () => {
   };
   const votedForMe = async () => {
     await fetchData();
-  }
+  };
   const toggleModal = () => {
     setModalJoin(!modalJoin);
   };
   const shareURL = async () => {
     await navigator.clipboard.writeText(`${REACT_APP_APP_URL}/rooms/${id}`);
-    gaEventTracker('room share')
+    gaEventTracker("room share");
     alert("URL successfully copied");
   };
   useEffect(() => {
@@ -438,7 +455,9 @@ export const RoomView = () => {
                   .map((song) => (
                     <Item>
                       <VoteCard
-                        voting={() => {voting(song.id)}}
+                        voting={() => {
+                          voting(song.id);
+                        }}
                         deejai={true}
                         deezerLink={song.deezer ? song.deezer.link : ""}
                         spotifyLink={song.spotify ? song.spotify.uri : ""}
@@ -496,7 +515,7 @@ export const RoomView = () => {
                 previewURL: string;
                 deezer: { preview: string; link: string } | null;
                 spotify: { previewUrl: string; uri: string } | null;
-                evaluation: {vote:  string}[];
+                evaluation: { vote: string }[];
               }) => {
                 return (
                   <SongCard
@@ -518,7 +537,11 @@ export const RoomView = () => {
                       },
                     ]}
                     isrc={`${song.isrc}`}
-                    status={song.evaluation.length !== 0 ? song.evaluation[0].vote : "neutral"}
+                    status={
+                      song.evaluation && song.evaluation.length !== 0
+                        ? song.evaluation[0].vote
+                        : "neutral"
+                    }
                     id={song.id}
                   />
                 );
