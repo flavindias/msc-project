@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { initialize } from "react-ga";
+import ReactGA from "react-ga4";
 import styled from "styled-components";
 import {
   BrowserRouter,
@@ -20,7 +20,7 @@ import { Login } from "./pages/login/login";
 import { isAuthenticated, getUser } from "./utils/auth";
 
 const {REACT_APP_TRACK_ID} = process.env;
-initialize(`${REACT_APP_TRACK_ID}`);
+ReactGA.initialize(`${REACT_APP_TRACK_ID}`);
 const AppContainer = styled.div`
   display: flex;
   align-items: center;
