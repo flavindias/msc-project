@@ -89,7 +89,6 @@ export const DeezerController = {
         createdAt: Date;
         updatedAt: Date;
       };
-      console.log(track, "getSongInfoISRC" );
       return res.status(200).json({
         message: "Success",
         track,

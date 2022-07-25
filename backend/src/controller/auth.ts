@@ -1,12 +1,12 @@
 import axios from "axios";
 import dotenv from "dotenv";
 // import db from "../middlewares/mongo";
-import { encodeUserToken } from "../middlewares/acl";
 import { Request, Response } from "express";
 import { compare, hashSync } from "bcryptjs";
 import { getToken } from "../middlewares/deezer";
-// import { KafkaConnection } from "../middlewares/kafka";
+import { encodeUserToken } from "../middlewares/acl";
 import { RequestCustom } from "../types/requestCustom";
+// import { KafkaConnection } from "../middlewares/kafka";
 import { PrismaClient, User, SpotifyInfo, DeezerInfo } from "@prisma/client";
 dotenv.config();
 
@@ -26,10 +26,10 @@ const findUser = async (email: string) => {
   return user as User & { spotify: SpotifyInfo; deezer: DeezerInfo };
 };
 
-const safeUser = (user: { password: unknown; }) => {
-  delete user.password
-  return user
-}
+const safeUser = (user: { password: unknown }) => {
+  delete user.password;
+  return user;
+};
 
 export const AuthController = {
   async spotify(req: Request, res: Response) {
@@ -54,6 +54,7 @@ export const AuthController = {
           spotify: true,
           deezer: true,
         },
+        
       });
 
       let userResponse: User;
@@ -101,13 +102,11 @@ export const AuthController = {
       // };
       // await kafka.publish("spotify-login", JSON.stringify(usr));
       // await db.collection("spotifyTokens").insertOne(usr);
-      return res
-        .status(200)
-        .json({
-          user: safeUser(userResponse),
-          token,
-          deejaiToken: encodeUserToken(userResponse.id),
-        });
+      return res.status(200).json({
+        user: safeUser(userResponse),
+        token,
+        deejaiToken: encodeUserToken(userResponse.id),
+      });
     } catch (err) {
       console.error(err);
       return res.status(500).json({
@@ -158,10 +157,9 @@ export const AuthController = {
         where: {
           deezer: {
             id: `${response.data.id}`,
-          } 
-        }
-
-      })
+          },
+        },
+      });
       if (!deezerInfo) {
         userResponse = await prisma.user.update({
           where: {
@@ -199,9 +197,11 @@ export const AuthController = {
       if (!email || !password) throw new Error("Email or password is missing");
       const user = await findUser(email);
       if (!user) throw new Error("User not found");
-      // const isValid = await compare(password, `${user.password}`);
-      // if (!isValid) throw new Error("Invalid email or password");
-      return res.status(200).json({ user: safeUser(user), token: encodeUserToken(user.id) });
+      const isValid = await compare(password, `${user.password}`);
+      if (!isValid) throw new Error("Invalid email or password");
+      return res
+        .status(200)
+        .json({ user: safeUser(user), token: encodeUserToken(user.id) });
     } catch (err) {
       console.error(err);
       return res.status(500).json({
@@ -217,9 +217,15 @@ export const AuthController = {
         where: {
           id: req.user.id,
         },
-        include: {
-          spotify: true,
-          deezer: true,
+        // include: {
+        //   spotify: true,
+        //   deezer: true,
+        // },
+        select: {
+          id: true,
+              name: true,
+              spotify: true,
+              deezer: true,
         },
       });
       return res.status(200).json({ user });

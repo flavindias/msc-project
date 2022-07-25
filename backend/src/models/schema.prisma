@@ -107,7 +107,7 @@ model Track {
   room         RoomTracks[]
   deezer       DeezerTrack?
   spotify      SpotifyTrack?
-  UserTracks   UserTracks[]
+  evaluation        UserTracks[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @default(now())
 }
@@ -211,7 +211,7 @@ model ArtistGenres {
 
 model Genre {
   id        String         @id @default(cuid())
-  name      String @unique
+  name      String         @unique
   artists   ArtistGenres[] @relation("artists")
   createdAt DateTime       @default(now())
   updatedAt DateTime       @default(now())

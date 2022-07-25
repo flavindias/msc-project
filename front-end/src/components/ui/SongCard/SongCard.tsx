@@ -64,13 +64,13 @@ const DislikeIcon = styled.i`
       color: #fa6359c5;
     }
 `;
-const NewIcon = styled.i`
-  color: ${(props: { status: string }) =>
-    props.status === "NEUTRAL" ? "#FFD700" : "#dadada"};
-    &:hover {
-      color: #ebdfa0;
-    }
-`;
+// const NewIcon = styled.i`
+//   color: ${(props: { status: string }) =>
+//     props.status === "NEUTRAL" ? "#FFD700" : "#dadada"};
+//     &:hover {
+//       color: #ebdfa0;
+//     }
+// `;
 const LikeIcon = styled.i`
   color: ${(props: { status: string }) =>
     props.status === "LIKE" ? "#42abc3" : "#dadada"};
@@ -98,12 +98,12 @@ const ArtistElement = styled.div`
   justify-content: center;
   margin-right: 1rem;
 `;
-const ArtistImage = styled.img`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-bottom: 0.5rem;
-`;
+// const ArtistImage = styled.img`
+//   width: 50px;
+//   height: 50px;
+//   border-radius: 50%;
+//   margin-bottom: 0.5rem;
+// `;
 const ArtistName = styled.span`
   font-size: unset;
   font-weight: 300;

@@ -24,18 +24,31 @@ export const RoomController = {
             },
           },
           owner: {
-            include: {
+            // include: {
+            //   spotify: true,
+            //   deezer: true,
+            // },
+            select: {
+              name: true,
+              
               spotify: true,
-              deezer: true,
-            },
+              deezer: true
+            }
           },
           users: {
             include: {
               user: {
-                include: {
+                select: {
+                  id: true,
+                  name: true,
                   spotify: true,
                   deezer: true,
+
                 },
+                // include: {
+                //   spotify: true,
+                //   deezer: true,
+                // },
               },
             },
           },
@@ -69,18 +82,30 @@ export const RoomController = {
             },
           },
           owner: {
-            include: {
-              spotify: true,
-              deezer: true,
+            select: {
+              id: true,
+                  name: true,
+                  spotify: true,
+                  deezer: true,
             },
+            // include: {
+            //   spotify: true,
+            //   deezer: true,
+            // },
           },
           users: {
             include: {
               user: {
-                include: {
-                  spotify: true,
-                  deezer: true,
+                select: {
+                  id: true,
+                      name: true,
+                      spotify: true,
+                      deezer: true,
                 },
+                // include: {
+                //   spotify: true,
+                //   deezer: true,
+                // },
               },
             },
           },
@@ -152,34 +177,47 @@ export const RoomController = {
         },
         include: {
           owner: {
-            include: {
-              spotify: true,
-              deezer: true,
-            }
+            select: {
+              id: true,
+                  name: true,
+                  spotify: true,
+                  deezer: true,
+            },
+            // include: {
+            //   spotify: true,
+            //   deezer: true,
+            // }
           },
           users: {
             include: {
               
               user: {
-                include: {
-                  votes: true,
-                  spotify: true,
-                  deezer: true,
-                }
+                select: {
+                  id: true,
+                      name: true,
+                      spotify: true,
+                      deezer: true,
+                      votes: true
+                },
+                // include: {
+                //   votes: true,
+                //   spotify: true,
+                //   deezer: true,
+                // }
               }
-            }
+            },
+
           },
 
           tracks: {
             include: {
-              
               track: {
                 include: {
                   artist: true,
                   contributors: true,
                   deezer: true,
                   spotify: true,
-                  UserTracks: {
+                  evaluation: {
                     where: {
                       userId: req.user.id
                     },
@@ -302,7 +340,12 @@ export const RoomController = {
           id,
         },
         include:{
-          users: true,
+          users: {
+            select: {
+              userId: true
+            }
+          },
+          
         }
       });
       if (!room) throw new Error("Room not found");

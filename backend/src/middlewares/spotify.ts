@@ -17,7 +17,6 @@ const saveNewTrack = async (spTrack: any) => {
           spotifyId: id,
         },
       });
-      if (checkArtist) artistId = checkArtist.artistId;
       if (!checkArtist) {
         const checkArtistByName = await prisma.artist.findFirst({
           where: {
@@ -60,6 +59,12 @@ const saveNewTrack = async (spTrack: any) => {
           artistId = newArtist.id;
         }
       }
+      else{
+        artistId = checkArtist.artistId;
+      }
+    }
+    else{
+      throw new Error('No artist found');
     }
     const track = await prisma.track.findUnique({
       where: {
@@ -188,8 +193,10 @@ export const getTrackInfo = async (isrc: string, token: string) => {
     if (data.tracks && data.tracks.items && data.tracks.items.length > 0) {
       return data.tracks.items[0];
     }
+    else{
+      return null;
+    }
 
-    return null;
   } catch (error) {
     console.error(error);
   }

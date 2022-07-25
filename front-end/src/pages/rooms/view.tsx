@@ -250,7 +250,7 @@ export const RoomView = () => {
       if (room.tracks) {
         const fetchedTracks = room.tracks.map(
           (trackInfo: {
-            track: { deezer: any | null; isrc: string; spotify: any | null, Usertracks: any | null };
+            track: { deezer: any | null; isrc: string; spotify: any | null, evaluation: any | null };
           }) => {
             return { ...trackInfo.track };
           }
@@ -306,6 +306,9 @@ export const RoomView = () => {
     await fetchData();
     setVote(true);
   };
+  const votedForMe = async () => {
+    await fetchData();
+  }
   const toggleModal = () => {
     setModalJoin(!modalJoin);
   };
@@ -493,12 +496,11 @@ export const RoomView = () => {
                 previewURL: string;
                 deezer: { preview: string; link: string } | null;
                 spotify: { previewUrl: string; uri: string } | null;
-                UserTracks: {vote:  string}[];
+                evaluation: {vote:  string}[];
               }) => {
-                console.log(song);
                 return (
                   <SongCard
-                    voting={() => {}}
+                    voting={votedForMe}
                     deejai={room.deejai}
                     key={song.isrc}
                     deezerLink={song.deezer ? song.deezer.link : ""}
@@ -516,7 +518,7 @@ export const RoomView = () => {
                       },
                     ]}
                     isrc={`${song.isrc}`}
-                    status={song.UserTracks.length !== 0 ? song.UserTracks[0].vote : "neutral"}
+                    status={song.evaluation.length !== 0 ? song.evaluation[0].vote : "neutral"}
                     id={song.id}
                   />
                 );
