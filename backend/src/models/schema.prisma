@@ -211,7 +211,7 @@ model ArtistGenres {
 
 model Genre {
   id        String         @id @default(cuid())
-  name      String
+  name      String @unique
   top       Int?
   left      Int?
   artists   ArtistGenres[] @relation("artists")
