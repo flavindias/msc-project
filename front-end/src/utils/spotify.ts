@@ -3,10 +3,12 @@ import { addHours } from "date-fns";
 import { NavigateFunction } from "react-router-dom";
 const { REACT_APP_API_URL } = process.env;
 
-const getLocalToken = () => JSON.parse(`${localStorage.getItem("spotifyToken")}`);
+const getLocalToken = () =>
+  JSON.parse(`${localStorage.getItem("spotifyToken")}`);
 export const getSpotifyToken = async (
   token: string,
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
+  location: string | null
 ) => {
   try {
     const response = await axios.get(`https://api.spotify.com/v1/me`, {
@@ -49,7 +51,12 @@ export const getSpotifyToken = async (
       "platform",
       JSON.stringify({ name: "spotify" })
     );
-    navigate("/rooms");
+    console.log(location, "getSpotify");
+    if (location) {
+      navigate(location);
+    } else {
+      navigate("/rooms");
+    }
   } catch (err) {
     console.error(err);
   }
@@ -89,7 +96,7 @@ export const getTrackInfoByISRC = async (isrc: string) => {
     const stored = getLocalToken();
     if (!stored) throw new Error("No token stored");
     const authenticated = JSON.parse(`${localStorage.getItem("deejaiToken")}`);
-    if(!authenticated) throw new Error("No deejai token stored");
+    if (!authenticated) throw new Error("No deejai token stored");
     await axios.post(
       `${REACT_APP_API_URL}/spotify/sync`,
       {
@@ -105,4 +112,4 @@ export const getTrackInfoByISRC = async (isrc: string) => {
   } catch (err) {
     console.error(err);
   }
-}
+};

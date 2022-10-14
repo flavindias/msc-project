@@ -34,16 +34,22 @@ const Content = styled.div`
     width: 100%;
   }
 `;
-
+interface stateType {
+    from: { pathname: string | null }
+  }
 const useQuery = async (navigate: NavigateFunction) => {
+  const location = useLocation();
+  console.log(location, "login")
+  // const state = location.state as stateType;
+  // console.log("login", state);
   const { hash, search } = useLocation();
   if (hash) {
     const token = hash.split("&")[0].split("=").at(1);
-    if (token) await getSpotifyToken(token, navigate);
+    if (token) await getSpotifyToken(token, navigate, "/rooms");
   }
   if (search) {
     const deezerToken = search.split("=").at(1);
-    if (deezerToken) await getDeezerToken(deezerToken, navigate);
+    if (deezerToken) await getDeezerToken(deezerToken, navigate, "/rooms");
   }
   return React.useMemo(() => new URLSearchParams(hash), [hash]);
 };

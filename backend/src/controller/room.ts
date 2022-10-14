@@ -4,6 +4,45 @@ import { RequestCustom } from "../types/requestCustom";
 
 const prisma = new PrismaClient();
 
+const deejaiReccomentadion = async () => {
+  try {
+    const roomId = "";
+    const room = await prisma.room.findUnique({
+      where: {
+        id: roomId,
+      },
+    });
+    if (!room) throw new Error("Room not found");
+    const users = await prisma.roomUser.findMany({
+      where: {
+        roomId
+      },
+    });
+    const members = [...users.map((user) => user.userId), room.ownerId];
+    const tracks = await prisma.userTracks.findMany({
+      where: {
+        userId: {
+          in: members,
+        },
+      },
+      include: {
+        track: {
+          include: {
+            artist: {
+              include: {
+                genres: true,
+              },
+            }
+          }
+        },
+      },
+    });
+  }
+  catch (error) {
+    console.log(error);
+  }
+
+};
 export const RoomController = {
   async list(expressRequest: Request, res: Response) {
     const req = expressRequest as RequestCustom;
@@ -322,6 +361,10 @@ export const RoomController = {
       });
     }
   },
+  async leave(expressRequest: Request, res: Response) {
+    console.log(expressRequest);
+    res.send("leave");
+  },
   async addTrack(expressRequest: Request, res: Response) {
     try{
       const req = expressRequest as RequestCustom;
@@ -369,6 +412,41 @@ export const RoomController = {
         });
       }
 
+    }
+    catch(err) {
+      console.error(err);
+      res.status(500).json({
+        message: err,
+      });
+    }
+  },
+  async createPlaylist(expressRequest: Request, res: Response) {
+    try{
+      await deejaiReccomentadion();
+      // const req = expressRequest as RequestCustom;
+      // const { id } = req.params;
+      // if (!id) throw new Error("RoomId is required");
+      // const room = await prisma.room.findUnique({
+      //   where: {
+      //     id,
+      //   },
+      //   include:{
+      //     users: {
+      //       select: {
+      //         userId: true
+      //       }
+      //     },
+          
+      //   }
+      // });
+      // if (!room) throw new Error("Room not found");
+      // const members = room.users.map(user => user.userId);
+      // if (room.ownerId !== req.user.id && !members.includes(req.user.id))
+      //   throw new Error("You can't create playlist to this room");
+      
+      // res.status(201).json({
+      //   message: "Playlist created",
+      // });
     }
     catch(err) {
       console.error(err);

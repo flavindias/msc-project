@@ -9,6 +9,7 @@ import {
   Navigate,
   Outlet,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 import { HomePage } from "./pages/home/home";
@@ -39,6 +40,7 @@ const routes = {
 
 const WithNavLayout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const authenticated = isAuthenticated();
   const [user, setUser] = useState({
     name: "",
@@ -66,7 +68,9 @@ const WithNavLayout = () => {
   }, [authenticated]);
 
   if (!authenticated) {
-    return <Navigate to={routes.login} />;
+    return <Navigate to={routes.home} replace state={{
+      from: location
+    }}/>;
   } else {
     return (
       <AppContainer>

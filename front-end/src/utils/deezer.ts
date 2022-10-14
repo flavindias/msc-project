@@ -1,16 +1,19 @@
 import axios from "axios";
 import { addHours } from "date-fns";
-import { NavigateFunction } from "react-router-dom";
+import { NavigateFunction, Location } from "react-router-dom";
 const { REACT_APP_API_URL } = process.env;
 
 const getLocalToken = () =>
   JSON.parse(`${localStorage.getItem("deezerToken")}`);
 
+  
 export const getDeezerToken = async (
   code: string,
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
+  location: string | null
 ) => {
   try {
+    console.log(location, "getDeezer");
     const { data } = await axios.post(`${REACT_APP_API_URL}/auth/deezer`, {
       token: code,
     });
@@ -29,7 +32,12 @@ export const getDeezerToken = async (
       })
     );
     window.localStorage.setItem("platform", JSON.stringify({ name: "deezer" }));
-    navigate("/rooms");
+    console.log(location, "getDeezer");
+    if(location) {
+      navigate(location);
+    } else {
+      navigate("/rooms");
+    }
   } catch (err) {
     console.error(err);
   }

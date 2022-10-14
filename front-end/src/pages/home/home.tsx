@@ -56,21 +56,28 @@ const SubTitle = styled.h2`
   font-family: "Montserrat", sans-serif;
   font-weight: 400;
 `;
-
+interface stateType {
+  from: { pathname: string | null }
+}
 const useQuery = async (navigate: NavigateFunction) => {
-  const { hash, search } = useLocation();
+  const location = useLocation();
+  const { hash, search } = location;
+  const state = location.state as stateType;
+  console.log("home", state);
   if (hash) {
     const token = hash.split("&")[0].split("=").at(1);
-    if (token) await getSpotifyToken(token, navigate);
+    if (token) await getSpotifyToken(token, navigate, state.from.pathname);
   }
   if (search) {
+    
     const deezerToken = search.split("=").at(1);
-    if (deezerToken) await getDeezerToken(deezerToken, navigate);
+    if (deezerToken) await getDeezerToken(deezerToken, navigate, state.from.pathname);
   }
   return React.useMemo(() => new URLSearchParams(hash), [hash]);
 };
 
 export const HomePage = () => {
+  
   const navigate: NavigateFunction = useNavigate();
   useQuery(navigate);
 
